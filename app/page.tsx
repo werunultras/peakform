@@ -153,12 +153,91 @@ export default function Page() {
 
   // 👇 ADD THE NEW FUNCTIONS HERE
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-    // ...full parser code...
+  const lines = txt.split(/\r?\n/);
+  const map: Record<string, string> = {};
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const k = line.slice(0, eq).trim().toUpperCase();
+    const v = line.slice(eq + 1).trim();
+    map[k] = v;
   }
 
-  async function handleImportTxt(file: File) {
-    // ...full handler code...
+  const date = map['DATE'] || todayISO();
+
+  const run = {
+    distanceKm: map['DIST_KM'],
+    durationMin: map['DURATION_MIN'],
+    pace: map['PACE'],
+    hrAvg: map['HR_AVG'],
+    hrMax: map['HR_MAX'],
+    cadence: map['CADENCE'],
+    strideM: map['STRIDE_M'],
+    elevUp: map['ELEV_UP'],
+    elevDown: map['ELEV_DOWN'],
+    calories: map['KCAL_RUN'],
+    sweatLossL: map['SWEAT_LOSS_L'],
+  };
+
+  const strength = {
+    description: map['STRENGTH_DESC'],
+    rounds: map['STRENGTH_ROUNDS'],
+    calories: map['STRENGTH_KCAL'],
+  };
+
+  const nutrition = {
+    calories: map['CALORIES'],
+    carbsG: map['CARBS_G'],
+    proteinG: map['PROTEIN_G'],
+    fatG: map['FAT_G'],
+    fibreG: map['FIBRE_G'],
+  };
+
+  const mindset = {
+    mood: map['MOOD'],
+    stress: map['STRESS'],
+    sleepQuality: map['SLEEP_QUALITY'],
+    notes: map['NOTES'],
+  };
+
+  const entry: Entry = {
+    date,
+    workout: { run, strength },
+    nutrition,
+    mindset,
+  };
+
+  const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
+
+  return { date, entry, calorieTarget };
+}
+
+async function handleImportTxt(file: File) {
+  const isTxt = /\.txt$/i.test(file.name);
+  if (!isTxt) {
+    alert('Please select a .txt file');
+    return;
   }
+  const txt = await file.text();
+  const { date, entry, calorieTarget } = parseDiaryTxt(txt);
+
+  // Optimistic update for UI
+  setEntries(prev => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
+
+  // Persist to Supabase
+  await pushEntry(date, entry);
+
+  // Optional: update calorie target from file
+  if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
+    const newSettings = { ...settings, calorieTarget };
+    setSettings(newSettings);
+    await pushSettings(newSettings);
+  }
+
+  alert(`Imported diary for ${date}`);
+}
 
   if (loading) return <div className="card">Loading…</div>;
   if (!userEmail)

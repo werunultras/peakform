@@ -32,3 +32,15 @@ body.peakform-bg::after {
   z-index: -1;
   background: rgba(0, 0, 0, 0.28); /* ~bg-black/30 */
 }
+
+/* Make header text white when logged in (body has .peakform-bg) */
+body.peakform-bg header h1,
+body.peakform-bg header nav a,
+body.peakform-bg header nav .btn {
+  color: white !important;
+  border-color: white !important;
+}
+
+body.peakform-bg header nav .btn:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* subtle hover */
+}

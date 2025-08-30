@@ -1,4 +1,3 @@
-```ts
 'use client';
 import { supabase } from './supabaseClient';
 import type { Entry, Settings } from './types';
@@ -117,4 +116,3 @@ export async function pushSettings(settings: Settings) {
   if (!user) return;
   await supabase.from('settings').upsert({ user_id: user.id, content: settings });
 }
-```

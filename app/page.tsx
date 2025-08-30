@@ -334,7 +334,6 @@ export default function Page() {
         Clear Day
       </button>
     </div>
-  </div>
 
   {/* Signed in */}
   <div>

@@ -1,16 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  ComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  Legend,
-} from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -48,15 +38,16 @@ export default function Page() {
     })();
   }, []);
 
+  // keep body background toggle if you added it earlier
   useEffect(() => {
-  if (userEmail) {
-    document.body.classList.add('peakform-bg');
-    return () => document.body.classList.remove('peakform-bg');
-  } else {
-    document.body.classList.remove('peakform-bg');
-  }
-}, [userEmail]);
-  
+    if (userEmail) {
+      document.body.classList.add('peakform-bg');
+      return () => document.body.classList.remove('peakform-bg');
+    } else {
+      document.body.classList.remove('peakform-bg');
+    }
+  }, [userEmail]);
+
   const entry = useMemo<Entry>(() => entries[date] ?? emptyEntry(date), [entries, date]);
 
   function update(path: string, value: any) {
@@ -79,25 +70,21 @@ export default function Page() {
     void pushSettings(next);
   }
 
-  // Streak = consecutive days up to today with nutrition calories > 0
-  const streak = useMemo(() => {
-  let days = 0;
-  const d = new Date();
-  // walk backwards until a day has CALORIES <= 0 or no entry
-  for (;;) {
-    const key = d.toISOString().slice(0, 10);
-    const e = entries[key];
-    const kcal = e ? toNum(e.nutrition?.calories) : 0;
-    if (kcal > 0) {
-      days += 1;
-      d.setDate(d.getDate() - 1);
-    } else {
-      break;
-    }
+  function handleClearDay() {
+    if (!confirm("Clear today's data and reset calorie target to 0?")) return;
+    const cleared: Entry = {
+      date,
+      workout: { run: {}, strength: {} },
+      nutrition: {},
+      mindset: { mood: '3', stress: '3', sleepQuality: '3', notes: '' },
+    };
+    setEntries((prev) => ({ ...prev, [date]: cleared }));
+    void pushEntry(date, cleared);
+    const newSettings = { ...settings, calorieTarget: 0 };
+    setSettings(newSettings);
+    void pushSettings(newSettings);
   }
-  return days;
-  }, [entries]);
-  
+
   const totals = useMemo(() => {
     const n = entry.nutrition;
     const cals = toNum(n.calories);
@@ -114,6 +101,7 @@ export default function Page() {
     };
   }, [entry, settings]);
 
+  // 14‑day chart data: calories + distance
   const chartData = useMemo(() => {
     const days = [...Array(14)].map((_, i) => {
       const d = new Date();
@@ -128,38 +116,39 @@ export default function Page() {
   }, [entries]);
 
   const endOfDayPrompt = useMemo(() => {
-  const r = entry.workout.run;
-  const s = entry.workout.strength;
-  const n = entry.nutrition;
-  const m = entry.mindset;
-  const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
+    const r = entry.workout.run;
+    const s = entry.workout.strength;
+    const n = entry.nutrition;
+    const m = entry.mindset;
+    const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
 
-  const lines = [
-    'Training — Today',
-    r.distanceKm || r.durationMin || r.pace
-      ? `• Run: ${fmt(r.distanceKm, 'km')} · ${fmt(r.durationMin, 'min')} · ${fmt(r.pace, 'pace')}`
-      : null,
-    r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg, 'avg')} / ${fmt(r.hrMax, 'max')}` : null,
-    r.cadence || r.strideM ? `  Cadence/Stride: ${fmt(r.cadence, 'spm')} · ${fmt(r.strideM, 'm')}` : null,
-    r.elevUp || r.elevDown ? `  Elevation: +${fmt(r.elevUp, 'm')} / −${fmt(r.elevDown, 'm')}` : null,
-    r.calories || r.sweatLossL
-      ? `  Calories: ${fmt(r.calories, 'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL, 'L')}`
-      : null,
-    s.description || s.rounds
-      ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''} ${
-          s.calories ? `— ~${s.calories} kcal (est.)` : ''
-        }`
-      : null,
-    '',
-    'Nutrition',
-    `• Calories: ${n.calories || '—'}`,
-    `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
-    '',
-    `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
-  ].filter(Boolean);
+    const lines = [
+      'Training — Today',
+      r.distanceKm || r.durationMin || r.pace
+        ? `• Run: ${fmt(r.distanceKm, 'km')} · ${fmt(r.durationMin, 'min')} · ${fmt(r.pace, 'pace')}`
+        : null,
+      r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg, 'avg')} / ${fmt(r.hrMax, 'max')}` : null,
+      r.cadence || r.strideM ? `  Cadence/Stride: ${fmt(r.cadence, 'spm')} · ${fmt(r.strideM, 'm')}` : null,
+      r.elevUp || r.elevDown ? `  Elevation: +${fmt(r.elevUp, 'm')} / −${fmt(r.elevDown, 'm')}` : null,
+      r.calories || r.sweatLossL
+        ? `  Calories: ${fmt(r.calories, 'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL, 'L')}`
+        : null,
+      s.description || s.rounds
+        ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''} ${
+            s.calories ? `— ~${s.calories} kcal (est.)` : ''
+          }`
+        : null,
+      '',
+      'Nutrition',
+      `• Calories: ${n.calories || '—'}`,
+      `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
+      '',
+      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
+    ].filter(Boolean);
 
-  return (lines as string[]).join('\n');
-}, [entry]);
+    return (lines as string[]).join('
+');
+  }, [entry]);
 
   async function copyPrompt() {
     try {
@@ -168,114 +157,23 @@ export default function Page() {
     } catch {}
   }
 
-  // ---------- TXT IMPORT: parser + handler (inside component) ----------
-  function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-    const lines = txt.split(/\r?\n/);;
-    const map: Record<string, string> = {};
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const k = line.slice(0, eq).trim().toUpperCase();
-      const v = line.slice(eq + 1).trim();
-      map[k] = v;
+  // Streak = consecutive days (including today) with nutrition calories > 0
+  const streak = useMemo(() => {
+    let days = 0;
+    const d = new Date();
+    while (true) {
+      const key = d.toISOString().slice(0, 10);
+      const e = entries[key];
+      const kcal = e ? toNum(e.nutrition?.calories) : 0;
+      if (kcal > 0) {
+        days += 1;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
     }
-
-    const date = map['DATE'] || todayISO();
-
-    const run = {
-      distanceKm: map['DIST_KM'],
-      durationMin: map['DURATION_MIN'],
-      pace: map['PACE'],
-      hrAvg: map['HR_AVG'],
-      hrMax: map['HR_MAX'],
-      cadence: map['CADENCE'],
-      strideM: map['STRIDE_M'],
-      elevUp: map['ELEV_UP'],
-      elevDown: map['ELEV_DOWN'],
-      calories: map['KCAL_RUN'],
-      sweatLossL: map['SWEAT_LOSS_L'],
-    };
-
-    const strength = {
-      description: map['STRENGTH_DESC'],
-      rounds: map['STRENGTH_ROUNDS'],
-      calories: map['STRENGTH_KCAL'],
-    };
-
-    const nutrition = {
-      calories: map['CALORIES'],
-      carbsG: map['CARBS_G'],
-      proteinG: map['PROTEIN_G'],
-      fatG: map['FAT_G'],
-      fibreG: map['FIBRE_G'],
-    };
-
-    const mindset = {
-      mood: map['MOOD'],
-      stress: map['STRESS'],
-      sleepQuality: map['SLEEP_QUALITY'],
-      notes: map['NOTES'],
-    };
-
-    const entry: Entry = {
-      date,
-      workout: { run, strength },
-      nutrition,
-      mindset,
-    };
-
-    const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
-
-    return { date, entry, calorieTarget };
-  }
-
-  async function handleImportTxt(file: File) {
-    const isTxt = /\.txt$/i.test(file.name);
-    if (!isTxt) {
-      alert('Please select a .txt file');
-      return;
-    }
-    const txt = await file.text();
-    const { date, entry, calorieTarget } = parseDiaryTxt(txt);
-
-    // Optimistic UI update
-    setEntries((prev) => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
-
-    // Persist
-    await pushEntry(date, entry);
-
-    if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
-      const newSettings = { ...settings, calorieTarget };
-      setSettings(newSettings);
-      await pushSettings(newSettings);
-    }
-
-    alert(`Imported diary for ${date}`);
-  }
-  
-  function handleClearDay() {
-  if (!confirm("Clear today's data and reset calorie target to 0?")) return;
-
-  // Reset today's entry
-  const cleared: Entry = {
-    date,
-    workout: { run: {}, strength: {} },
-    nutrition: {},
-    mindset: { mood: '3', stress: '3', sleepQuality: '3', notes: '' },
-  };
-
-  setEntries((prev) => ({ ...prev, [date]: cleared }));
-  void pushEntry(date, cleared);
-
-  // Reset daily calorie target field (to 0 so the number input isn't blank)
-  const newSettings = { ...settings, calorieTarget: 0 };
-  setSettings(newSettings);
-  void pushSettings(newSettings);
-}
-  
-  // -------------------------------------------------------------------
+    return days;
+  }, [entries]);
 
   if (loading) return <div className="card">Loading…</div>;
   if (!userEmail)
@@ -295,56 +193,44 @@ export default function Page() {
     <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
-  {/* Date */}
-  <div>
-    <div className="label">Date</div>
-    <input
-      className="input h-10"
-      type="date"
-      value={date}
-      onChange={(e) => setDate(e.target.value)}
-    />
-  </div>
-
-  {/* Streak */}
-  <div>
-    <div className="label">Streak</div>
-    <div className="h-10 rounded-xl border px-3 flex items-center font-semibold">
-      {streak} {streak === 1 ? 'day' : 'days'}
-    </div>
-  </div>
-
-  {/* Daily calorie target + Clear Day */}
-  <div>
-    <div className="label">Daily calorie target</div>
-    <div className="flex items-center gap-2">
-      <input
-        className="input h-10"
-        type="number"
-        value={settings.calorieTarget}
-        onChange={(e) =>
-          saveSettings({ calorieTarget: Number(e.target.value || 0) })
-        }
-      />
-      <button
-        type="button"
-        className="btn h-10 whitespace-nowrap px-3"
-        onClick={handleClearDay}
-      >
-        Clear Day
-      </button>
-    </div>
-
-  {/* Signed in */}
-  <div>
-    <div className="label">Signed in as</div>
-        <div className="text-sm text-neutral-600 h-10 flex items-center">
-          {userEmail}
+          {/* Date */}
+          <div>
+            <div className="label">Date</div>
+            <input className="input h-10" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
-        </div>
 
-          {/* Spacer cell to balance to 5 cols, or remove if not needed */}
-        <div />
+          {/* Streak */}
+          <div>
+            <div className="label">Streak</div>
+            <div className="h-10 rounded-xl border px-3 flex items-center font-semibold">
+              {streak} {streak === 1 ? 'day' : 'days'}
+            </div>
+          </div>
+
+          {/* Daily calorie target + Clear Day */}
+          <div>
+            <div className="label">Daily calorie target</div>
+            <div className="flex items-center gap-2">
+              <input
+                className="input h-10"
+                type="number"
+                value={settings.calorieTarget}
+                onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })}
+              />
+              <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>
+                Clear Day
+              </button>
+            </div>
+          </div>
+
+          {/* Signed in */}
+          <div>
+            <div className="label">Signed in as</div>
+            <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
+          </div>
+
+          <div />
+        </div>
       </div>
 
       {/* Import card */}
@@ -419,35 +305,25 @@ export default function Page() {
         </div>
         <div>
           <div className="label">Notes</div>
-          <textarea
-            className="input h-28"
-            value={entry.mindset.notes || ''}
-            onChange={(e) => update('mindset.notes', e.target.value)}
-            placeholder="Reflections, soreness, stressors, wins…"
-          />
+          <textarea className="input h-28" value={entry.mindset.notes || ''} onChange={(e) => update('mindset.notes', e.target.value)} placeholder="Reflections, soreness, stressors, wins…" />
         </div>
       </div>
 
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Today — Summary</h3>
-
-          {/* Top row: run metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-            <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+            <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+            <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
             <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
             <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
           </div>
-
-          {/* Existing row: calories/macros */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
             <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
             <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
             <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
           </div>
-
           <div className="text-sm">
             Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
             {totals.deficit > 0
@@ -464,17 +340,12 @@ export default function Page() {
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tickMargin={6} />
-                {/* Distance left axis */}
                 <YAxis yAxisId="left" domain={[0, 'auto']} />
-                {/* Calories right axis */}
                 <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                {/* Distance as GREEN bars */}
-                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
-                {/* Calories target */}
+                <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
                 <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
-                {/* Calories line */}
                 <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>

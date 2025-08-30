@@ -117,7 +117,7 @@ export default function Page() {
       `• Calories: ${n.calories || '—'}`,
       `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
       '',
-      `Mindset — Mood ${m.mood || '—'}/5 · Energy ${m.energy || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep ${m.sleepHrs || '—'}h (Q${m.sleepQuality || '—'}/5)`,
+      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
     ].filter(Boolean);
 
     return (lines as string[]).join('\n');
@@ -210,9 +210,7 @@ export default function Page() {
         <h3 className="text-lg font-medium">Mindset</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {range('Mood (1–5)', 'mindset.mood', entry.mindset.mood, update)}
-          {range('Energy (1–5)', 'mindset.energy', entry.mindset.energy, update)}
           {range('Stress (1–5)', 'mindset.stress', entry.mindset.stress, update)}
-          {num('Sleep (hrs)', 'mindset.sleepHrs', entry.mindset.sleepHrs, update)}
           {range('Sleep Quality (1–5)', 'mindset.sleepQuality', entry.mindset.sleepQuality, update)}
         </div>
         <div>

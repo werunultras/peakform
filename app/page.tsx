@@ -77,14 +77,14 @@ export default function Page() {
   }, [entry, settings]);
 
   const chartData = useMemo(() => {
-    const days = [...Array(14)].map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (13 - i));
-      const key = d.toISOString().slice(0, 10);
-      const e = entries[key];
-      const cal = e ? toNum(e.nutrition?.calories) : 0;
-      const mood = e ? toNum(e.mindset?.mood) : 0;
-      return { date: key.slice(5), calories: cal, mood };
+  const days = [...Array(14)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (13 - i));
+    const key = d.toISOString().slice(0, 10);
+    const e = entries[key];
+    const cal = e ? toNum(e.nutrition?.calories) : 0;
+    const dist = e ? toNum(e.workout?.run?.distanceKm) : 0;
+    return { date: key.slice(5), calories: cal, distance: dist };
     });
     return days;
   }, [entries]);
@@ -244,20 +244,20 @@ export default function Page() {
         </div>
 
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">14-day trend — Calories & Mood</h3>
+          <h3 className="text-lg font-medium">14-day trend — Calories & Distance</h3>
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} />
-                <YAxis yAxisId="left" domain={[0, 'auto']} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 5]} />
-                <Tooltip />
-                <ReferenceLine yAxisId="left" y={settings.calorieTarget} strokeDasharray="4 4" />
-                <Line yAxisId="left" type="monotone" dataKey="calories" strokeWidth={2} dot={false} />
-                <Line yAxisId="right" type="monotone" dataKey="mood" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+            <XAxis dataKey="date" tickMargin={6} />
+            <YAxis yAxisId="left" domain={[0, 'auto']} />
+            <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
+            <Tooltip />
+            <ReferenceLine yAxisId="left" y={settings.calorieTarget} strokeDasharray="4 4" />
+            <Line yAxisId="left" type="monotone" dataKey="calories" strokeWidth={2} dot={false} />
+            <Line yAxisId="right" type="monotone" dataKey="distance" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+        </div>
         </div>
       </div>
 

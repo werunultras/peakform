@@ -1,6 +1,6 @@
-‘use client’;
-import { supabase } from ‘@/lib/supabaseClient’;
-import type { Entry, Settings } from ‘@/lib/types’;
+'use client’;
+import { supabase } from '@/lib/supabaseClient’;
+import type { Entry, Settings } from '@/lib/types’;
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -8,7 +8,7 @@ export const emptyEntry = (date = todayISO()): Entry => ({
 date,
 workout: { run: {}, strength: {} },
 nutrition: {},
-mindset: { mood: ‘3’, energy: ‘3’, stress: ‘3’, sleepQuality: ‘3’ },
+mindset: { mood: '3’, energy: '3’, stress: '3’, sleepQuality: '3’ },
 });
 
 export const defaultSettings: Settings = {
@@ -26,15 +26,15 @@ const user = await getUser();
 if (!user) return null;
 
 const { data: entries, error: e1 } = await supabase
-.from(‘entries’)
-.select(‘date, content’)
-.order(‘date’);
+.from('entries’)
+.select('date, content’)
+.order('date’);
 if (e1) throw e1;
 
 const { data: settings, error: e2 } = await supabase
-.from(‘settings’)
-.select(‘content’)
-.eq(‘user_id’, user.id)
+.from('settings’)
+.select('content’)
+.eq('user_id’, user.id)
 .maybeSingle();
 if (e2) throw e2;
 
@@ -46,12 +46,12 @@ settings: settings?.content ?? defaultSettings,
 
 export async function pushEntry(date: string, entry: Entry) {
 const user = await getUser();
-if (!user) throw new Error(‘Not authenticated’);
-await supabase.from(‘entries’).upsert({ user_id: user.id, date, content: entry });
+if (!user) throw new Error('Not authenticated’);
+await supabase.from('entries’).upsert({ user_id: user.id, date, content: entry });
 }
 
 export async function pushSettings(settings: Settings) {
 const user = await getUser();
-if (!user) throw new Error(‘Not authenticated’);
-await supabase.from(‘settings’).upsert({ user_id: user.id, content: settings });
+if (!user) throw new Error('Not authenticated’);
+await supabase.from('settings’).upsert({ user_id: user.id, content: settings });
 }

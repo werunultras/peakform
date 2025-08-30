@@ -144,8 +144,8 @@ export default function Page() {
 
   const n = entry.nutrition;
 
-  return (
-      <div className="space-y-6">
+   return (
+    <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
@@ -164,6 +164,7 @@ export default function Page() {
           <div className="text-sm self-center text-neutral-600">Signed in as {userEmail}</div>
           <div />
         </div>
+      </div>
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Run</h3>

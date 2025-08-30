@@ -79,6 +79,25 @@ export default function Page() {
     void pushSettings(next);
   }
 
+  // Streak = consecutive days up to today with nutrition calories > 0
+  const streak = useMemo(() => {
+  let days = 0;
+  const d = new Date();
+  // walk backwards until a day has CALORIES <= 0 or no entry
+  for (;;) {
+    const key = d.toISOString().slice(0, 10);
+    const e = entries[key];
+    const kcal = e ? toNum(e.nutrition?.calories) : 0;
+    if (kcal > 0) {
+      days += 1;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return days;
+  }, [entries]);
+  
   const totals = useMemo(() => {
     const n = entry.nutrition;
     const cals = toNum(n.calories);
@@ -275,22 +294,32 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
+  {/* Date */}
   <div>
     <div className="label">Date</div>
     <input
-      className="input"
+      className="input h-10"
       type="date"
       value={date}
       onChange={(e) => setDate(e.target.value)}
     />
   </div>
 
+  {/* Streak */}
+  <div>
+    <div className="label">Streak</div>
+    <div className="h-10 rounded-xl border px-3 flex items-center font-semibold">
+      {streak} {streak === 1 ? 'day' : 'days'}
+    </div>
+  </div>
+
+  {/* Daily calorie target + Clear Day */}
   <div>
     <div className="label">Daily calorie target</div>
-    <div className="flex gap-2">
+    <div className="flex items-center gap-2">
       <input
-        className="input"
+        className="input h-10"
         type="number"
         value={settings.calorieTarget}
         onChange={(e) =>
@@ -298,23 +327,26 @@ export default function Page() {
         }
       />
       <button
-      type="button"
-      className="btn whitespace-nowrap px-3"
-      onClick={handleClearDay}
+        type="button"
+        className="btn h-10 whitespace-nowrap px-3"
+        onClick={handleClearDay}
       >
-      Clear Day
+        Clear Day
       </button>
+    </div>
+  </div>
+
+  {/* Signed in */}
+  <div>
+    <div className="label">Signed in as</div>
+        <div className="text-sm text-neutral-600 h-10 flex items-center">
+          {userEmail}
+          </div>
+        </div>
+
+          {/* Spacer cell to balance to 5 cols, or remove if not needed */}
+        <div />
       </div>
-    </div>
-          
-    <div>
-      <div className="label">Signed in as</div>
-      <div className="text-sm text-neutral-600">{userEmail}</div>
-    </div>
-          
-      <div>{/* empty cell if you want spacing */}</div>
-      </div>
-    </div>
 
       {/* Import card */}
       <div className="card">

@@ -142,9 +142,7 @@ export default function Page() {
 
   // ---------- TXT IMPORT: parser + handler (inside component) ----------
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-    const lines = txt.split(/
-?
-/);
+    const lines = txt.split(/\r?\n/);;
     const map: Record<string, string> = {};
     for (const raw of lines) {
       const line = raw.trim();

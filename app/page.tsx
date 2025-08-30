@@ -428,8 +428,8 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Today — Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-            <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+            <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+            <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
             <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
             <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
           </div>
@@ -455,7 +455,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
                 <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
                 <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
                 <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
               </ComposedChart>

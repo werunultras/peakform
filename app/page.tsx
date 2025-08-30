@@ -230,8 +230,8 @@ export default function Page() {
 
   {/* Top row: run metrics */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-    <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-    <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+    <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+    <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
     <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
     <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
   </div>

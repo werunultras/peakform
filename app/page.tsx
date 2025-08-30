@@ -226,22 +226,33 @@ export default function Page() {
 
       <div className="grid-2">
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Today — Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
-          </div>
-          <div className="text-sm">
-            Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
-            {totals.deficit > 0
-              ? `(${fmtNum(totals.deficit)} kcal below target)`
-              : totals.deficit < 0
-              ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
-              : '(on target)'}
-          </div>
-        </div>
+  <h3 className="text-lg font-medium">Today — Summary</h3>
+
+  {/* Top row: run metrics */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+    <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+    <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+    <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
+    <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
+  </div>
+
+  {/* Existing row: calories/macros */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+    <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
+    <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
+    <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
+    <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
+  </div>
+
+  <div className="text-sm">
+    Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
+    {totals.deficit > 0
+      ? `(${fmtNum(totals.deficit)} kcal below target)`
+      : totals.deficit < 0
+      ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
+      : '(on target)'}
+  </div>
+</div>
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Calories & Distance</h3>

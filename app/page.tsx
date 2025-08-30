@@ -291,16 +291,17 @@ export default function Page() {
       <button type="button" className="btn" onClick={handleClearDay}>
         Clear Day
       </button>
-    </div>
-  </div>
-        <div>
-          <div className="label">Signed in as</div>
-          <div className="text-sm text-neutral-600">{userEmail}</div>
-          </div>
-          <div>{/* empty cell if you want spacing */}</div>
-          </div>
-        </div>
       </div>
+    </div>
+          
+    <div>
+      <div className="label">Signed in as</div>
+      <div className="text-sm text-neutral-600">{userEmail}</div>
+    </div>
+          
+      <div>{/* empty cell if you want spacing */}</div>
+      </div>
+    </div>
 
       {/* Import card */}
       <div className="card">

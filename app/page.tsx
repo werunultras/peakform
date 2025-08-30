@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -247,16 +247,22 @@ export default function Page() {
           <h3 className="text-lg font-medium">14-day trend — Calories & Distance</h3>
           <div className="h-56">
           <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-            <XAxis dataKey="date" tickMargin={6} />
-            <YAxis yAxisId="left" domain={[0, 'auto']} />
-            <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
-            <Tooltip />
-            <ReferenceLine yAxisId="left" y={settings.calorieTarget} strokeDasharray="4 4" />
-            <Line yAxisId="left" type="monotone" dataKey="calories" strokeWidth={2} dot={false} />
-            <Line yAxisId="right" type="monotone" dataKey="distance" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+          <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+          <XAxis dataKey="date" tickMargin={6} />
+          {/* Left Y axis for Calories */}
+          <YAxis yAxisId="left" domain={[0, 'auto']} />
+          {/* Right Y axis for Distance (km) */}
+          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
+          <Tooltip />
+          <Legend />
+          {/* Target calorie reference line */}
+          <ReferenceLine yAxisId="left" y={settings.calorieTarget} strokeDasharray="4 4" />
+          {/* Distance as GREEN bars */}
+          <Bar yAxisId="right" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+          {/* Calories as a line */}
+          <Line yAxisId="left" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
+          </ComposedChart>
+          </ResponsiveContainer>
         </div>
         </div>
       </div>

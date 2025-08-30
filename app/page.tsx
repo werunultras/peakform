@@ -151,6 +151,19 @@ export default function Page() {
     } catch {}
   }
 
+if (loading) return <div className="card">Loading…</div>;
+  if (!userEmail)
+    return (/* login required card */);
+
+  const n = entry.nutrition;
+
+  return (
+    <div className="space-y-6">
+      {/* ... */}
+    </div>
+  );
+}
+  
   // 👇 ADD THE NEW FUNCTIONS HERE
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
   const lines = txt.split(/\r?\n/);
@@ -239,20 +252,6 @@ async function handleImportTxt(file: File) {
   alert(`Imported diary for ${date}`);
 }
 
-  if (loading) return <div className="card">Loading…</div>;
-  if (!userEmail)
-    return (/* login required card */);
-
-  const n = entry.nutrition;
-
-  return (
-    <div className="space-y-6">
-      {/* ... */}
-    </div>
-  );
-}
-
-  
    return (
     <div className="space-y-6">
       <div className="card">

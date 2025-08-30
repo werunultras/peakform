@@ -11,4 +11,3 @@ body { @apply bg-neutral-50 text-neutral-900; }
 .btn-primary { @apply bg-black text-white hover:bg-neutral-800 border-black; }
 .grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
 .grid-3 { @apply grid grid-cols-1 md:grid-cols-3 gap-3; }
-.grid-4 { @apply grid grid-cols-2 md:grid-cols-4 gap-3; }

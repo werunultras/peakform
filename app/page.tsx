@@ -280,7 +280,7 @@ export default function Page() {
               value={settings.calorieTarget}
               onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })}
               />
-              <button type="button" className="btn" onClick={handleClearDay}>Clear day</button>
+              <button type="button" className="btn" onClick={handleClearDay}>Clear Day</button>
             </div>
           </div>
           <div className="text-sm self-center text-neutral-600">Signed in as {userEmail}</div>

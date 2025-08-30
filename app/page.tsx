@@ -11,6 +11,28 @@ const toNum = (v: any) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+<div className="card">
+  <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
+  <div className="flex items-center gap-3 text-sm">
+    <label className="btn cursor-pointer">
+      Select .txt file
+      <input
+        type="file"
+        accept=".txt"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleImportTxt(f);
+          e.currentTarget.value = '';
+        }}
+      />
+    </label>
+    <div className="text-neutral-600">
+      Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10.0, DURATION_MIN=50, ...).
+    </div>
+  </div>
+</div>
+
 export default function Page() {
   const [date, setDate] = useState<string>(todayISO());
   const [entries, setEntries] = useState<Record<string, Entry>>({});
@@ -39,28 +61,6 @@ export default function Page() {
   }, []);
 
   const entry = useMemo<Entry>(() => entries[date] ?? emptyEntry(date), [entries, date]);
-
-<div className="card">
-  <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
-  <div className="flex items-center gap-3 text-sm">
-    <label className="btn cursor-pointer">
-      Select .txt file
-      <input
-        type="file"
-        accept=".txt"
-        className="hidden"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) void handleImportTxt(f);
-          e.currentTarget.value = '';
-        }}
-      />
-    </label>
-    <div className="text-neutral-600">
-      Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10.0, DURATION_MIN=50, ...).
-    </div>
-  </div>
-</div>
   
   function update(path: string, value: any) {
     setEntries((prev) => {

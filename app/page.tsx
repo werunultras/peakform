@@ -156,13 +156,6 @@ if (loading) return <div className="card">Loading…</div>;
     return (/* login required card */);
 
   const n = entry.nutrition;
-
-  return (
-    <div className="space-y-6">
-      {/* ... */}
-    </div>
-  );
-}
   
   // 👇 ADD THE NEW FUNCTIONS HERE
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
@@ -252,6 +245,12 @@ async function handleImportTxt(file: File) {
   alert(`Imported diary for ${date}`);
 }
 
+  return (
+    <div className="space-y-6">
+      {/* ... */}
+    </div>
+  );
+}
    return (
     <div className="space-y-6">
       <div className="card">

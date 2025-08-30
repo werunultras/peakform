@@ -288,8 +288,12 @@ export default function Page() {
           saveSettings({ calorieTarget: Number(e.target.value || 0) })
         }
       />
-      <button type="button" className="btn" onClick={handleClearDay}>
-        Clear Day
+      <button
+      type="button"
+      className="btn whitespace-nowrap px-3"
+      onClick={handleClearDay}
+      >
+      Clear Day
       </button>
       </div>
     </div>

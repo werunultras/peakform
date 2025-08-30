@@ -8,7 +8,7 @@ export const emptyEntry = (date = todayISO()): Entry => ({
   date,
   workout: { run: {}, strength: {} },
   nutrition: {},
-  mindset: { mood: "3", energy: "3", stress: "3", sleepQuality: "3" },
+  mindset: { mood: "3", stress: "3", sleepQuality: "3" },
 });
 
 export const defaultSettings: Settings = {

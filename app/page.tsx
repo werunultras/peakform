@@ -266,25 +266,39 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <div className="label">Date</div>
-            <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+  <div>
+    <div className="label">Date</div>
+    <input
+      className="input"
+      type="date"
+      value={date}
+      onChange={(e) => setDate(e.target.value)}
+    />
+  </div>
+
+  <div>
+    <div className="label">Daily calorie target</div>
+    <div className="flex gap-2">
+      <input
+        className="input"
+        type="number"
+        value={settings.calorieTarget}
+        onChange={(e) =>
+          saveSettings({ calorieTarget: Number(e.target.value || 0) })
+        }
+      />
+      <button type="button" className="btn" onClick={handleClearDay}>
+        Clear Day
+      </button>
+    </div>
+  </div>
+        <div>
+          <div className="label">Signed in as</div>
+          <div className="text-sm text-neutral-600">{userEmail}</div>
           </div>
-          <div>
-            <div className="label">Daily calorie target</div>
-              <div className="flex items-center gap-2">
-              <input
-              className="input"
-              type="number"
-              value={settings.calorieTarget}
-              onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })}
-              />
-              <button type="button" className="btn" onClick={handleClearDay}>Clear Day</button>
-            </div>
+          <div>{/* empty cell if you want spacing */}</div>
           </div>
-          <div className="text-sm self-center text-neutral-600">Signed in as {userEmail}</div>
-          <div />
         </div>
       </div>
 

@@ -226,6 +226,27 @@ export default function Page() {
 
     alert(`Imported diary for ${date}`);
   }
+  
+  function handleClearDay() {
+  if (!confirm("Clear today's data and reset calorie target to 0?")) return;
+
+  // Reset today's entry
+  const cleared: Entry = {
+    date,
+    workout: { run: {}, strength: {} },
+    nutrition: {},
+    mindset: { mood: '3', stress: '3', sleepQuality: '3', notes: '' },
+  };
+
+  setEntries((prev) => ({ ...prev, [date]: cleared }));
+  void pushEntry(date, cleared);
+
+  // Reset daily calorie target field (to 0 so the number input isn't blank)
+  const newSettings = { ...settings, calorieTarget: 0 };
+  setSettings(newSettings);
+  void pushSettings(newSettings);
+}
+  
   // -------------------------------------------------------------------
 
   if (loading) return <div className="card">Loading…</div>;
@@ -252,12 +273,15 @@ export default function Page() {
           </div>
           <div>
             <div className="label">Daily calorie target</div>
-            <input
+              <div className="flex items-center gap-2">
+              <input
               className="input"
               type="number"
               value={settings.calorieTarget}
               onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })}
-            />
+              />
+              <button type="button" className="btn" onClick={handleClearDay}>Clear day</button>
+            </div>
           </div>
           <div className="text-sm self-center text-neutral-600">Signed in as {userEmail}</div>
           <div />

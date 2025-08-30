@@ -446,3 +446,4 @@ async function handleImportTxt(file: File) {
     alert('Import failed. Check the file format.');
   }
 }
+}

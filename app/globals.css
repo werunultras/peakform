@@ -11,3 +11,24 @@ body { @apply bg-neutral-50 text-neutral-900; }
 .btn-primary { @apply bg-black text-white hover:bg-neutral-800 border-black; }
 .grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
 .grid-3 { @apply grid grid-cols-1 md:grid-cols-3 gap-3; }
+
+/* Full-page background when logged in */
+body.peakform-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+  z-index: -1;            /* behind everything */
+  background-image: url("/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Optional: subtle dark overlay for readability (tweak opacity as you like) */
+body.peakform-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.28); /* ~bg-black/30 */
+}

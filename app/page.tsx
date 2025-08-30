@@ -36,7 +36,95 @@ export default function Page() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, []
+           function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
+  const lines = txt.split(/\r?\n/);
+  const map: Record<string, string> = {};
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const k = line.slice(0, eq).trim().toUpperCase();
+    const v = line.slice(eq + 1).trim();
+    map[k] = v;
+  }
+
+  const date = map['DATE'] || todayISO();
+
+  const run = {
+    distanceKm: map['DIST_KM'],
+    durationMin: map['DURATION_MIN'],
+    pace: map['PACE'],
+    hrAvg: map['HR_AVG'],
+    hrMax: map['HR_MAX'],
+    cadence: map['CADENCE'],
+    strideM: map['STRIDE_M'],
+    elevUp: map['ELEV_UP'],
+    elevDown: map['ELEV_DOWN'],
+    calories: map['KCAL_RUN'],
+    sweatLossL: map['SWEAT_LOSS_L'],
+  };
+
+  const strength = {
+    description: map['STRENGTH_DESC'],
+    rounds: map['STRENGTH_ROUNDS'],
+    calories: map['STRENGTH_KCAL'],
+  };
+
+  const nutrition = {
+    calories: map['CALORIES'],
+    carbsG: map['CARBS_G'],
+    proteinG: map['PROTEIN_G'],
+    fatG: map['FAT_G'],
+    fibreG: map['FIBRE_G'],
+  };
+
+  const mindset = {
+    mood: map['MOOD'],
+    stress: map['STRESS'],
+    sleepQuality: map['SLEEP_QUALITY'],
+    notes: map['NOTES'],
+  };
+
+  const entry: Entry = {
+    date,
+    workout: { run, strength },
+    nutrition,
+    mindset,
+  };
+
+  const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
+
+  return { date, entry, calorieTarget };
+}
+
+async function handleImportTxt(file: File) {
+  const isTxt = /\.txt$/i.test(file.name);
+  if (!isTxt) {
+    alert('Please select a .txt file');
+    return;
+  }
+  const txt = await file.text();
+  const { date, entry, calorieTarget } = parseDiaryTxt(txt);
+
+  // Optimistic update for UI
+  setEntries(prev => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
+
+  // Persist to Supabase
+  await pushEntry(date, entry);
+
+  // Optional: update calorie target from file
+  if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
+    const newSettings = { ...settings, calorieTarget };
+    setSettings(newSettings);
+    await pushSettings(newSettings);
+  }
+
+  alert(`Imported diary for ${date}`);
+}
+           
+           );
 
   const entry = useMemo<Entry>(() => entries[date] ?? emptyEntry(date), [entries, date]);
   
@@ -185,6 +273,7 @@ export default function Page() {
       <div className="text-neutral-600">
         Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
       </div>
+    </div>
     </div>
       
       <div className="card space-y-3">
@@ -354,94 +443,4 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
       {sub && <div className="text-xs text-neutral-500">{sub}</div>}
     </div>
   );
-}
-
-function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-  const lines = txt.split(/\r?\n/);
-  const map: Record<string, string> = {};
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const eq = line.indexOf('=');
-    if (eq === -1) continue;
-    const k = line.slice(0, eq).trim().toUpperCase();
-    const v = line.slice(eq + 1).trim();
-    map[k] = v;
-  }
-
-  const date = map['DATE'] || todayISO();
-
-  const run = {
-    distanceKm: map['DIST_KM'],
-    durationMin: map['DURATION_MIN'],
-    pace: map['PACE'],
-    hrAvg: map['HR_AVG'],
-    hrMax: map['HR_MAX'],
-    cadence: map['CADENCE'],
-    strideM: map['STRIDE_M'],
-    elevUp: map['ELEV_UP'],
-    elevDown: map['ELEV_DOWN'],
-    calories: map['KCAL_RUN'],
-    sweatLossL: map['SWEAT_LOSS_L'],
-  };
-
-  const strength = {
-    description: map['STRENGTH_DESC'],
-    rounds: map['STRENGTH_ROUNDS'],
-    calories: map['STRENGTH_KCAL'],
-  };
-
-  const nutrition = {
-    calories: map['CALORIES'],
-    carbsG: map['CARBS_G'],
-    proteinG: map['PROTEIN_G'],
-    fatG: map['FAT_G'],
-    fibreG: map['FIBRE_G'],
-  };
-
-  const mindset = {
-    mood: map['MOOD'],
-    stress: map['STRESS'],
-    sleepQuality: map['SLEEP_QUALITY'],
-    notes: map['NOTES'],
-  };
-
-  const entry: Entry = {
-    date,
-    workout: { run, strength },
-    nutrition,
-    mindset,
-  };
-
-  const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
-
-  return { date, entry, calorieTarget };
-}
-
-async function handleImportTxt(file: File) {
-  const isTxt = /\.txt$/i.test(file.name);
-  if (!isTxt) {
-    alert('Please select a .txt file');
-    return;
-  }
-  const txt = await file.text();
-  try {
-    const { date, entry, calorieTarget } = parseDiaryTxt(txt);
-
-    // Optimistic update of diary
-    setEntries(prev => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
-    await pushEntry(date, entry);
-
-    // Update calorie target if present
-    if (calorieTarget) {
-      const newSettings = { ...settings, calorieTarget };
-      setSettings(newSettings);
-      await pushSettings(newSettings);
-    }
-
-    alert(`Imported diary for ${date}`);
-  } catch (e: any) {
-    console.error(e);
-    alert('Import failed. Check the file format.');
-  }
 }

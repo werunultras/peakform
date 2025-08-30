@@ -145,12 +145,6 @@ export default function Page() {
   const n = entry.nutrition;
 
   return (
-      <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/background.jpg')" }}
-      >
-      {/* overlay so text stays readable */}
-      <div className="min-h-screen bg-black/40">
       <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -169,9 +163,6 @@ export default function Page() {
           </div>
           <div className="text-sm self-center text-neutral-600">Signed in as {userEmail}</div>
           <div />
-        </div>
-        </div>
-        </div>
         </div>
 
       <div className="card space-y-3">

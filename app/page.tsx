@@ -1,4 +1,4 @@
-```tsx
+tsx
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -493,4 +493,3 @@ function Stat({ label, value, sub }: {label:string; value:string; sub?:string}){
     </div>
   );
 }
-```

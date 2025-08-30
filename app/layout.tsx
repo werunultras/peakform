@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = { title: 'PeakForm', description: 'High‑performance training diary' };
+export const metadata: Metadata = { title: 'PeakForm', description: 'High-performance training diary' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </header>
           {children}
-          <footer className="mt-8 text-xs text-neutral-500">Built free on Next.js + Supabase. Sign in to use PeakForm.</footer>
+          <footer className="mt-8 text-xs text-neutral-500">Built on Next.js + Supabase. Sign in to use PeakForm.</footer>
         </div>
       </body>
     </html>

@@ -172,7 +172,6 @@ export default function Page() {
         </div>
         </div>
         </div>
-        </div>
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Run</h3>

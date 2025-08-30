@@ -1,4 +1,3 @@
-```json
 {
   "name": "peakform",
   "private": true,
@@ -24,4 +23,3 @@
     "typescript": "^5.4.5"
   }
 }
-```

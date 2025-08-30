@@ -1,4 +1,3 @@
-```tsx
 'use client';
 import { FormEvent, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
@@ -30,4 +29,3 @@ export default function Login() {
     </div>
   );
 }
-```

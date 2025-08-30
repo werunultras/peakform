@@ -1,4 +1,3 @@
-```ts
 export type Run = {
   distanceKm?: string; durationMin?: string; pace?: string;
   hrAvg?: string; hrMax?: string; cadence?: string; strideM?: string;
@@ -19,4 +18,3 @@ export type Settings = {
   calorieTarget: number;
   macroTargets: { carbsG: number; proteinG: number; fatG: number; fibreG: number };
 };
-```

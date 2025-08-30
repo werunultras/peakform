@@ -1,6 +1,16 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import {
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  Legend,
+} from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -18,7 +28,7 @@ export default function Page() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     (async () => {
       try {
@@ -39,7 +49,7 @@ export default function Page() {
   }, []);
 
   const entry = useMemo<Entry>(() => entries[date] ?? emptyEntry(date), [entries, date]);
-  
+
   function update(path: string, value: any) {
     setEntries((prev) => {
       const cur = prev[date] ?? emptyEntry(date);
@@ -77,14 +87,14 @@ export default function Page() {
   }, [entry, settings]);
 
   const chartData = useMemo(() => {
-  const days = [...Array(14)].map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (13 - i));
-    const key = d.toISOString().slice(0, 10);
-    const e = entries[key];
-    const cal = e ? toNum(e.nutrition?.calories) : 0;
-    const dist = e ? toNum(e.workout?.run?.distanceKm) : 0;
-    return { date: key.slice(5), calories: cal, distance: dist };
+    const days = [...Array(14)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (13 - i));
+      const key = d.toISOString().slice(0, 10);
+      const e = entries[key];
+      const cal = e ? toNum(e.nutrition?.calories) : 0;
+      const dist = e ? toNum(e.workout?.run?.distanceKm) : 0;
+      return { date: key.slice(5), calories: cal, distance: dist };
     });
     return days;
   }, [entries]);
@@ -119,8 +129,9 @@ export default function Page() {
       '',
       `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
     ].filter(Boolean);
-    
-    return (lines as string[]).join('\n');
+
+    return (lines as string[]).join('
+');
   }, [entry]);
 
   async function copyPrompt() {
@@ -129,6 +140,96 @@ export default function Page() {
       alert('Prompt copied');
     } catch {}
   }
+
+  // ---------- TXT IMPORT: parser + handler (inside component) ----------
+  function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
+    const lines = txt.split(/
+?
+/);
+    const map: Record<string, string> = {};
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eq = line.indexOf('=');
+      if (eq === -1) continue;
+      const k = line.slice(0, eq).trim().toUpperCase();
+      const v = line.slice(eq + 1).trim();
+      map[k] = v;
+    }
+
+    const date = map['DATE'] || todayISO();
+
+    const run = {
+      distanceKm: map['DIST_KM'],
+      durationMin: map['DURATION_MIN'],
+      pace: map['PACE'],
+      hrAvg: map['HR_AVG'],
+      hrMax: map['HR_MAX'],
+      cadence: map['CADENCE'],
+      strideM: map['STRIDE_M'],
+      elevUp: map['ELEV_UP'],
+      elevDown: map['ELEV_DOWN'],
+      calories: map['KCAL_RUN'],
+      sweatLossL: map['SWEAT_LOSS_L'],
+    };
+
+    const strength = {
+      description: map['STRENGTH_DESC'],
+      rounds: map['STRENGTH_ROUNDS'],
+      calories: map['STRENGTH_KCAL'],
+    };
+
+    const nutrition = {
+      calories: map['CALORIES'],
+      carbsG: map['CARBS_G'],
+      proteinG: map['PROTEIN_G'],
+      fatG: map['FAT_G'],
+      fibreG: map['FIBRE_G'],
+    };
+
+    const mindset = {
+      mood: map['MOOD'],
+      stress: map['STRESS'],
+      sleepQuality: map['SLEEP_QUALITY'],
+      notes: map['NOTES'],
+    };
+
+    const entry: Entry = {
+      date,
+      workout: { run, strength },
+      nutrition,
+      mindset,
+    };
+
+    const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
+
+    return { date, entry, calorieTarget };
+  }
+
+  async function handleImportTxt(file: File) {
+    const isTxt = /\.txt$/i.test(file.name);
+    if (!isTxt) {
+      alert('Please select a .txt file');
+      return;
+    }
+    const txt = await file.text();
+    const { date, entry, calorieTarget } = parseDiaryTxt(txt);
+
+    // Optimistic UI update
+    setEntries((prev) => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
+
+    // Persist
+    await pushEntry(date, entry);
+
+    if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
+      const newSettings = { ...settings, calorieTarget };
+      setSettings(newSettings);
+      await pushSettings(newSettings);
+    }
+
+    alert(`Imported diary for ${date}`);
+  }
+  // -------------------------------------------------------------------
 
   if (loading) return <div className="card">Loading…</div>;
   if (!userEmail)
@@ -144,114 +245,7 @@ export default function Page() {
 
   const n = entry.nutrition;
 
-  async function copyPrompt() {
-    try {
-      await navigator.clipboard.writeText(endOfDayPrompt);
-      alert('Prompt copied');
-    } catch {}
-  }
-
-if (loading) return <div className="card">Loading…</div>;
-  if (!userEmail)
-    return (/* login required card */);
-
-  const n = entry.nutrition;
-  
-  // 👇 ADD THE NEW FUNCTIONS HERE
-  function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-  const lines = txt.split(/\r?\n/);
-  const map: Record<string, string> = {};
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const eq = line.indexOf('=');
-    if (eq === -1) continue;
-    const k = line.slice(0, eq).trim().toUpperCase();
-    const v = line.slice(eq + 1).trim();
-    map[k] = v;
-  }
-
-  const date = map['DATE'] || todayISO();
-
-  const run = {
-    distanceKm: map['DIST_KM'],
-    durationMin: map['DURATION_MIN'],
-    pace: map['PACE'],
-    hrAvg: map['HR_AVG'],
-    hrMax: map['HR_MAX'],
-    cadence: map['CADENCE'],
-    strideM: map['STRIDE_M'],
-    elevUp: map['ELEV_UP'],
-    elevDown: map['ELEV_DOWN'],
-    calories: map['KCAL_RUN'],
-    sweatLossL: map['SWEAT_LOSS_L'],
-  };
-
-  const strength = {
-    description: map['STRENGTH_DESC'],
-    rounds: map['STRENGTH_ROUNDS'],
-    calories: map['STRENGTH_KCAL'],
-  };
-
-  const nutrition = {
-    calories: map['CALORIES'],
-    carbsG: map['CARBS_G'],
-    proteinG: map['PROTEIN_G'],
-    fatG: map['FAT_G'],
-    fibreG: map['FIBRE_G'],
-  };
-
-  const mindset = {
-    mood: map['MOOD'],
-    stress: map['STRESS'],
-    sleepQuality: map['SLEEP_QUALITY'],
-    notes: map['NOTES'],
-  };
-
-  const entry: Entry = {
-    date,
-    workout: { run, strength },
-    nutrition,
-    mindset,
-  };
-
-  const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
-
-  return { date, entry, calorieTarget };
-}
-
-async function handleImportTxt(file: File) {
-  const isTxt = /\.txt$/i.test(file.name);
-  if (!isTxt) {
-    alert('Please select a .txt file');
-    return;
-  }
-  const txt = await file.text();
-  const { date, entry, calorieTarget } = parseDiaryTxt(txt);
-
-  // Optimistic update for UI
-  setEntries(prev => ({ ...prev, [date]: { ...(prev[date] ?? emptyEntry(date)), ...entry } }));
-
-  // Persist to Supabase
-  await pushEntry(date, entry);
-
-  // Optional: update calorie target from file
-  if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
-    const newSettings = { ...settings, calorieTarget };
-    setSettings(newSettings);
-    await pushSettings(newSettings);
-  }
-
-  alert(`Imported diary for ${date}`);
-}
-
   return (
-    <div className="space-y-6">
-      {/* ... */}
-    </div>
-  );
-}
-   return (
     <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -273,28 +267,29 @@ async function handleImportTxt(file: File) {
         </div>
       </div>
 
-    <div className="card">
-      <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
-      <div className="flex items-center gap-3 text-sm">
-        <label className="btn cursor-pointer">
-          Select .txt file
-        <input
-          type="file"
-          accept=".txt"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void handleImportTxt(f);
-            e.currentTarget.value = '';
-          }}
-        />
-        </label>
-      <div className="text-neutral-600">
-        Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
+      {/* Import card */}
+      <div className="card">
+        <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
+        <div className="flex items-center gap-3 text-sm">
+          <label className="btn cursor-pointer">
+            Select .txt file
+            <input
+              type="file"
+              accept=".txt"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleImportTxt(f);
+                e.currentTarget.value = '';
+              }}
+            />
+          </label>
+          <div className="text-neutral-600">
+            Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
-      
+
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Run</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -355,52 +350,55 @@ async function handleImportTxt(file: File) {
 
       <div className="grid-2">
         <div className="card space-y-2">
-  <h3 className="text-lg font-medium">Today — Summary</h3>
+          <h3 className="text-lg font-medium">Today — Summary</h3>
 
-  {/* Top row: run metrics */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-    <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-    <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
-    <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
-    <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
-  </div>
+          {/* Top row: run metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+            <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+            <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
+            <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
+          </div>
 
-  {/* Existing row: calories/macros */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-    <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
-    <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
-    <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
-    <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
-  </div>
+          {/* Existing row: calories/macros */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
+            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
+            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
+            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
+          </div>
 
-  <div className="text-sm">
-    Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
-    {totals.deficit > 0
-      ? `(${fmtNum(totals.deficit)} kcal below target)`
-      : totals.deficit < 0
-      ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
-      : '(on target)'}
-  </div>
-</div>
+          <div className="text-sm">
+            Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
+            {totals.deficit > 0
+              ? `(${fmtNum(totals.deficit)} kcal below target)`
+              : totals.deficit < 0
+              ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
+              : '(on target)'}
+          </div>
+        </div>
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Calories & Distance</h3>
           <div className="h-56">
-          <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-          <XAxis dataKey="date" tickMargin={6} />
-          <YAxis yAxisId="left" domain={[0, 'auto']} />   {/* Distance */}
-          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} /> {/* Calories */}
-          <Tooltip />
-          <Legend />
-          {/* Distance as GREEN bars, left axis */}
-          <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
-          {/* Calories as line, right axis */}
-          <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
-          <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
-          </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tickMargin={6} />
+                {/* Distance left axis */}
+                <YAxis yAxisId="left" domain={[0, 'auto']} />
+                {/* Calories right axis */}
+                <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
+                <Tooltip />
+                <Legend />
+                {/* Distance as GREEN bars */}
+                <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+                {/* Calories target */}
+                <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
+                {/* Calories line */}
+                <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
@@ -418,7 +416,6 @@ async function handleImportTxt(file: File) {
 function label(s: string) {
   return <div className="label">{s}</div>;
 }
-
 function num(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div>
@@ -427,7 +424,6 @@ function num(l: string, p: string, v: any, on: (p: string, v: any) => void) {
     </div>
   );
 }
-
 function text(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div>
@@ -436,24 +432,14 @@ function text(l: string, p: string, v: any, on: (p: string, v: any) => void) {
     </div>
   );
 }
-
 function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div className="select-none">
       {label(`${l} ${(v || '—') as string}/5`)}
-      <input
-        type="range"
-        min={1}
-        max={5}
-        step={1}
-        value={v || 3}
-        onChange={(e) => on(p, e.target.value)}
-        className="w-full"
-      />
+      <input type="range" min={1} max={5} step={1} value={v || 3} onChange={(e) => on(p, e.target.value)} className="w-full" />
     </div>
   );
 }
-
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-xl border p-3">

@@ -383,7 +383,50 @@ export default function Page() {
   );
 }
 
-function label(s: string) { return <div className="label">{s}</div>; }
-function num(l: string, p: string, v: any, on: (p: string, v: any) => void) { return (<div>{label(l)}<input className="input" type="number" value={v || ''} onChange={(e) => on(p, e.target.value)} /></div>); }
-function text(l: string, p: string, v: any, on: (p: string, v: any) => void) { return (<div>{label(l)}<input className="input" value={v || ''} onChange={(e) => on(p, e.target.value)} /></div>); }
-function range(l: string, p: string, v: any, on: (p: string, v: any) => void) { return (<div className="select-none">{label(`${l}
+function label(s: string) {
+  return <div className="label">{s}</div>;
+}
+
+function num(l: string, p: string, v: any, on: (p: string, v: any) => void) {
+  return (
+    <div>
+      {label(l)}
+      <input
+        className="input"
+        type="number"
+        value={v || ''}
+        onChange={(e) => on(p, e.target.value)}
+      />
+    </div>
+  );
+}
+
+function text(l: string, p: string, v: any, on: (p: string, v: any) => void) {
+  return (
+    <div>
+      {label(l)}
+      <input
+        className="input"
+        value={v || ''}
+        onChange={(e) => on(p, e.target.value)}
+      />
+    </div>
+  );
+}
+
+function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
+  return (
+    <div className="select-none">
+      {label(`${l} ${(v || '—') as string}/5`)}
+      <input
+        type="range"
+        min={1}
+        max={5}
+        step={1}
+        value={v || 3}
+        onChange={(e) => on(p, e.target.value)}
+        className="w-full"
+      />
+    </div>
+  );
+}

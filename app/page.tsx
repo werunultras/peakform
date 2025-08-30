@@ -260,18 +260,15 @@ export default function Page() {
           <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
           <XAxis dataKey="date" tickMargin={6} />
-          {/* Left Y axis for Calories */}
-          <YAxis yAxisId="left" domain={[0, 'auto']} />
-          {/* Right Y axis for Distance (km) */}
-          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
+          <YAxis yAxisId="left" domain={[0, 'auto']} />   {/* Distance */}
+          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} /> {/* Calories */}
           <Tooltip />
           <Legend />
-          {/* Target calorie reference line */}
-          <ReferenceLine yAxisId="left" y={settings.calorieTarget} strokeDasharray="4 4" />
-          {/* Distance as GREEN bars */}
-          <Bar yAxisId="right" dataKey="distance" name="Distance (km)" fill="#22c55e" />
-          {/* Calories as a line */}
-          <Line yAxisId="left" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
+          {/* Distance as GREEN bars, left axis */}
+          <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+          {/* Calories as line, right axis */}
+          <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
+          <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
           </ComposedChart>
           </ResponsiveContainer>
         </div>

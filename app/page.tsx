@@ -48,6 +48,15 @@ export default function Page() {
     })();
   }, []);
 
+  useEffect(() => {
+  if (userEmail) {
+    document.body.classList.add('peakform-bg');
+    return () => document.body.classList.remove('peakform-bg');
+  } else {
+    document.body.classList.remove('peakform-bg');
+  }
+}, [userEmail]);
+  
   const entry = useMemo<Entry>(() => entries[date] ?? emptyEntry(date), [entries, date]);
 
   function update(path: string, value: any) {

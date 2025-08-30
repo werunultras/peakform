@@ -277,6 +277,7 @@ export default function Page() {
 function label(s: string) {
   return <div className="label">{s}</div>;
 }
+
 function num(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div>
@@ -285,6 +286,7 @@ function num(l: string, p: string, v: any, on: (p: string, v: any) => void) {
     </div>
   );
 }
+
 function text(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div>
@@ -293,4 +295,30 @@ function text(l: string, p: string, v: any, on: (p: string, v: any) => void) {
     </div>
   );
 }
-function range(l: string
+
+function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
+  return (
+    <div className="select-none">
+      {label(`${l} ${(v || '—') as string}/5`)}
+      <input
+        type="range"
+        min={1}
+        max={5}
+        step={1}
+        value={v || 3}
+        onChange={(e) => on(p, e.target.value)}
+        className="w-full"
+      />
+    </div>
+  );
+}
+
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-xl border p-3">
+      <div className="text-xs text-neutral-600">{label}</div>
+      <div className="text-xl font-semibold tabular-nums">{value}</div>
+      {sub && <div className="text-xs text-neutral-500">{sub}</div>}
+    </div>
+  );
+}

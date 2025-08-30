@@ -300,27 +300,39 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-start">
           {/* Date */}
-          <div>
+          <div className="md:col-span-2">
             <div className="label">Date</div>
             <input className="input h-10" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
-          {/* Streak */}
-          <div>
+          
+          {/* Streak (narrower) */}
+          <div className="md:col-span-1">
             <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center font-semibold">{streak} {streak === 1 ? 'day' : 'days'}</div>
-          </div>
-          {/* Daily calorie target + Clear Day */}
-          <div>
-            <div className="label">Daily calorie target</div>
-            <div className="flex items-center gap-2">
-              <input className="input h-10" type="number" value={settings.calorieTarget} onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })} />
-              <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>Clear Day</button>
+            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold">
+              {streak} {streak === 1 ? 'day' : 'days'}
             </div>
           </div>
-          {/* Signed in */}
-          <div>
+          
+          {/* Daily calorie target + Clear Day (wider) */}
+          <div className="md:col-span-3">
+            <div className="label">Daily calorie target</div>
+            <div className="flex items-center gap-2">
+              <input
+                className="input h-10 w-full"
+                type="number"
+                value={settings.calorieTarget}
+                onChange={(e) => saveSettings({ calorieTarget: Number(e.target.value || 0) })}
+              />
+              <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>
+                Clear Day
+              </button>
+            </div>
+          </div>
+          
+          {/* Signed in (narrower) */}
+          <div className="md:col-span-1">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
           </div>

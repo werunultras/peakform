@@ -1,0 +1,16 @@
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light dark; }
+body { @apply bg-neutral-50 text-neutral-900; }
+.card { @apply rounded-2xl border bg-white p-5 shadow-sm; }
+.label { @apply text-sm font-medium text-neutral-700; }
+.input { @apply w-full rounded-xl border px-3 py-2; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50; }
+.btn-primary { @apply bg-black text-white hover:bg-neutral-800 border-black; }
+.grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
+.grid-3 { @apply grid grid-cols-1 md:grid-cols-3 gap-3; }
+.grid-4 { @apply grid grid-cols-2 md:grid-cols-4 gap-3; }
+```

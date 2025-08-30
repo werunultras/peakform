@@ -265,7 +265,7 @@ export default function Page() {
           <Tooltip />
           <Legend />
           {/* Distance as GREEN bars, left axis */}
-          <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+          <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
           {/* Calories as line, right axis */}
           <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
           <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />

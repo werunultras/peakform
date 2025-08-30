@@ -146,8 +146,7 @@ export default function Page() {
       `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
     ].filter(Boolean);
 
-    return (lines as string[]).join('
-');
+    return (lines as string[]).join('\n');
   }, [entry]);
 
   async function copyPrompt() {

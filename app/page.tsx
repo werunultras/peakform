@@ -333,4 +333,18 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
       {sub && <div className="text-xs text-neutral-500">{sub}</div>}
     </div>
   );
+
+  return (
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/background.jpg')" }}
+    >
+      {/* dark overlay to improve text readability */}
+      <div className="min-h-screen bg-black/40">
+        <div className="space-y-6">
+          {/* ⬇️ ALL your existing cards/summary/charts go here */}
+        </div>
+      </div>
+    </div>
+  );
 }

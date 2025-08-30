@@ -18,20 +18,6 @@ export default function Page() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-return (
-  <div
-    className="min-h-screen bg-cover bg-center bg-no-repeat"
-    style={{ backgroundImage: "url('/background.jpg')" }}
-  >
-    {/* add an overlay so text is readable */}
-    <div className="min-h-screen bg-black/40">
-      <div className="space-y-6">
-        {/* all your existing cards go here */}
-      </div>
-    </div>
-  </div>
-);
   
   useEffect(() => {
     (async () => {

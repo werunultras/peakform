@@ -4,17 +4,17 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
-useEffect(() => {
-  document.body.classList.add('hero-bg');
-  return () => document.body.classList.remove('hero-bg');
-}, []);
-
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+  document.body.classList.add('hero-bg');
+  return () => document.body.classList.remove('hero-bg');
+}, []);
+  
   // If already logged in, send to /diary
   useEffect(() => {
     let mounted = true;

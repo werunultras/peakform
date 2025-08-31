@@ -391,7 +391,8 @@ export default function Page() {
         {error && <div className="text-sm text-red-600">{error}</div>}
       </div>
     );
-
+  }
+  
   const n = entry.nutrition;
 
   return (

@@ -342,6 +342,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         {/* Spacer (1/7) */}
         <div className="md:col-span-1" />
       </div>
+      </div>
     
       {/* Import card */}
       <div className="card">

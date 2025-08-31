@@ -7,6 +7,11 @@ html, body {
   height: 100%;
 }
 
+/* Layout helpers */
+.grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
 /* Default card style */
 .card {
   @apply rounded-2xl border bg-white p-5 shadow-sm;

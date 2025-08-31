@@ -148,7 +148,7 @@ export default function Page() {
       r.cadence || r.strideM ? `  Cadence/Stride: ${fmt(r.cadence, 'spm')} · ${fmt(r.strideM, 'm')}` : null,
       r.elevUp || r.elevDown ? `  Elevation: +${fmt(r.elevUp, 'm')} / −${fmt(r.elevDown, 'm')}` : null,
       r.calories || r.sweatLossL ? `  Calories: ${fmt(r.calories, 'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL, 'L')}` : null,
-      s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.weightLbs ? ` — ${s.weightLbs} lbs` : ''} ${s.rounds ? `(${s.rounds} rounds)` : ''} ${s.calories ? `— ~${s.calories} kcal (est.)` : ''}` : null,
+      s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''}${s.weightLbs ? ` — ${s.weightLbs} lbs` : ''}${s.calories ? ` — ~${s.calories} kcal (est.)` : ''}` : null,
       '',
       'Nutrition',
       `• Calories: ${n.calories || '—'}`,

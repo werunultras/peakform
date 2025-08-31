@@ -34,26 +34,20 @@ export default function Home() {
           PeakForm unites training, nutrition, and mindset in a single daily check-in.
         </p>
 
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <Link
-            href="/login"
-            className="btn bg-white text-black border-white hover:bg-white/90 px-5 py-3 rounded-xl"
-          >
-            Get Started
-          </Link>
-          <Link
-            href="/login"
-            className="btn text-white border-white hover:bg-white/10 px-5 py-3 rounded-xl"
-          >
-            See example entry
-          </Link>
+        <div className="mt-8 flex items-center justify-center">
+        <Link
+          href="/login"
+          className="btn bg-white text-black border-white hover:bg-white/90 px-5 py-3 rounded-xl"
+        >
+          Get Started
+        </Link>
         </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md p-4 text-left">
             <div className="text-white/80 text-sm mb-2">Body</div>
             <div className="text-white font-medium">Run + Strength</div>
-            <div className="text-white/80 text-sm mt-1">Distance, HR, pace, rounds</div>
+            <div className="text-white/80 text-sm mt-1">Distance, HR, pace, routines</div>
           </div>
           <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md p-4 text-left">
             <div className="text-white/80 text-sm mb-2">Fuel</div>

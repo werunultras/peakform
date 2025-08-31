@@ -55,19 +55,17 @@ export default function Page() {
 
   useEffect(() => {
   if (userEmail) {
-    // logged in: remove hero background (use your normal app bg if you have one)
+    // Logged in: show the app background
     document.body.classList.remove('hero-bg');
-    // optional: if you use a diary bg class, enable it here:
-    // document.body.classList.add('peakform-bg');
+    document.body.classList.add('app-bg');
   } else {
-    // logged out: show the hero background behind the Sign-in card
+    // Logged out: show the hero (canoe) background
     document.body.classList.add('hero-bg');
-    // optional: ensure app bg is off
-    // document.body.classList.remove('peakform-bg');
+    document.body.classList.remove('app-bg');
   }
   return () => {
     document.body.classList.remove('hero-bg');
-    // document.body.classList.remove('peakform-bg');
+    document.body.classList.remove('app-bg');
   };
 }, [userEmail]);
   

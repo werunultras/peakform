@@ -54,20 +54,9 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-  if (userEmail) {
-    // Logged in: show the app background
-    document.body.classList.remove('hero-bg');
-    document.body.classList.add('app-bg');
-  } else {
-    // Logged out: show the hero (canoe) background
-    document.body.classList.add('hero-bg');
-    document.body.classList.remove('app-bg');
-  }
-  return () => {
-    document.body.classList.remove('hero-bg');
-    document.body.classList.remove('app-bg');
-  };
-}, [userEmail]);
+  document.body.classList.add('hero-bg');
+  return () => document.body.classList.remove('hero-bg');
+}, []);
   
   // Load user + cloud data
   useEffect(() => {

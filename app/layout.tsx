@@ -14,9 +14,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <nav className="flex items-center gap-3 text-sm">
               <Link className="btn" href="/">Diary</Link>
               <Link className="btn" href="/login">Login</Link>
-              {userEmail && (
-              <button className="btn" onClick={handleLogout}>Logout</button>
-            )}
             </nav>
           </header>
           {children}

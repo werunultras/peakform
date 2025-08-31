@@ -53,6 +53,24 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+  if (userEmail) {
+    // logged in: remove hero background (use your normal app bg if you have one)
+    document.body.classList.remove('hero-bg');
+    // optional: if you use a diary bg class, enable it here:
+    // document.body.classList.add('peakform-bg');
+  } else {
+    // logged out: show the hero background behind the Sign-in card
+    document.body.classList.add('hero-bg');
+    // optional: ensure app bg is off
+    // document.body.classList.remove('peakform-bg');
+  }
+  return () => {
+    document.body.classList.remove('hero-bg');
+    // document.body.classList.remove('peakform-bg');
+  };
+}, [userEmail]);
+  
   // Load user + cloud data
   useEffect(() => {
     (async () => {

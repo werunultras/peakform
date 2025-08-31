@@ -2,66 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light dark; }
-body { @apply bg-neutral-50 text-neutral-900; }
-.card { @apply rounded-2xl border bg-white p-5 shadow-sm; }
-.label { @apply text-sm font-medium text-neutral-700; }
-.input { @apply w-full rounded-xl border px-3 py-2; }
-.btn { @apply inline-flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50; }
-.btn-primary { @apply bg-black text-white hover:bg-neutral-800 border-black; }
-.grid-2 { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
-.grid-3 { @apply grid grid-cols-1 md:grid-cols-3 gap-3; }
-
-/* Full-page background when logged in */
-body.peakform-bg::before {
-  content: "";
-  position: fixed;
-  inset: 0;               /* top:0; right:0; bottom:0; left:0 */
-  z-index: -1;            /* behind everything */
-  background-image: url("/background.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+/* Root should always allow full-height backgrounds */
+html, body {
+  height: 100%;
 }
 
-/* Optional: subtle dark overlay for readability (tweak opacity as you like) */
-body.peakform-bg::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: rgba(0, 0, 0, 0.28); /* ~bg-black/30 */
+/* Default card style */
+.card {
+  @apply rounded-2xl border bg-white p-5 shadow-sm;
 }
 
-/* Make header text white when logged in (body has .peakform-bg) */
-body.peakform-bg header h1,
-body.peakform-bg header nav a,
-body.peakform-bg header nav .btn {
-  color: white !important;
-  border-color: white !important;
+/* Default input style */
+.input {
+  @apply w-full rounded-xl border px-3 py-2 text-sm shadow-sm;
 }
 
-body.peakform-bg header nav .btn:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* subtle hover */
+/* Default button style */
+.btn {
+  @apply rounded-xl border px-4 py-2 text-sm font-medium shadow-sm;
 }
-/* Full-page background for the home hero */
+
+.btn-primary {
+  @apply bg-black text-white border-black hover:bg-neutral-800;
+}
+
+.label {
+  @apply mb-1 block text-xs font-medium text-neutral-600;
+}
+
+/* Full-page canoe background with built-in dark overlay */
 body.hero-bg {
-  background-image: url("/background.jpg"); /* canoe photo in /public */
+  background-image:
+    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
+    url("/background.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-/* Subtle dark overlay for readability across the whole page (under all content) */
-body.hero-bg::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: rgba(0,0,0,.45);
-}
-
-/* Invert the header to white on the hero page */
+/* Invert the header on hero */
 body.hero-bg header,
 body.hero-bg header * {
   color: #fff !important;

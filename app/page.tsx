@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
+useEffect(() => {
+  document.body.classList.add('hero-bg');
+  return () => document.body.classList.remove('hero-bg');
+}, []);
+
 export default function Home() {
   const router = useRouter();
 

@@ -7,6 +7,14 @@ export default function Login() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+const redirectTo =
+  typeof window !== 'undefined' ? `${window.location.origin}/diary` : undefined;
+
+const { error } = await supabase.auth.signInWithOtp({
+  email,
+  options: { emailRedirectTo: redirectTo },
+});
+  
   async function onSubmit(e: FormEvent) {
     e.preventDefault(); setError(null);
     const { error } = await supabase.auth.signInWithOtp({

@@ -12,19 +12,22 @@ html, body {
   @apply grid grid-cols-1 md:grid-cols-2 gap-4;
 }
 
-/* Default card style */
+/* Readable glass for app cards */
 .card {
   @apply rounded-2xl border p-5 shadow-sm;
-  background-color: rgba(255, 255, 255, 0.1); /* light translucent background */
-  backdrop-filter: blur(8px);                 /* frosted effect */
-  -webkit-backdrop-filter: blur(8px);         /* Safari support */
-  border-color: rgba(255, 255, 255, 0.15);    /* subtle translucent border */
+  background-color: rgba(255, 255, 255, 0.88); /* almost solid */
+  backdrop-filter: blur(4px);                   /* subtle blur */
+  -webkit-backdrop-filter: blur(4px);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 /* Default input style */
 .input {
   @apply w-full rounded-xl border px-3 py-2 text-sm shadow-sm;
+  background-color: #fff;        /* solid */
+  color: #111827;                /* neutral-900 */
 }
+.label { @apply mb-1 block text-xs font-medium text-neutral-700; }
 
 /* Default button style */
 .btn {
@@ -42,7 +45,7 @@ html, body {
 /* Full-page canoe background with built-in dark overlay */
 body.hero-bg {
   background-image:
-    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
+    linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
     url("/background.jpg");
   background-size: cover;
   background-position: center;

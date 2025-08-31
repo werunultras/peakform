@@ -343,7 +343,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         <div className="md:col-span-1" />
       </div>
     </div>
-
+    
       {/* Import card */}
       <div className="card">
         <h3 className="text-lg font-medium mb-3">Import from .txt</h3>

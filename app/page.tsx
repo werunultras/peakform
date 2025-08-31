@@ -295,16 +295,16 @@ export default function Page() {
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Today — Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Distance (km)" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-            <Stat label="Duration (min)" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+            <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+            <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
             <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
             <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target {settings.macroTargets.carbsG}`} />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target {settings.macroTargets.proteinG}`} />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target {settings.macroTargets.fatG}`} />
+            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
+            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
+            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
           </div>
           <div className="text-sm">Status: <span className="font-medium capitalize">{totals.balance}</span> {totals.deficit > 0 ? `(${fmtNum(totals.deficit)} kcal below target)` : totals.deficit < 0 ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)` : '(on target)'}
           </div>
@@ -320,7 +320,7 @@ export default function Page() {
                 <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="distance" name="Distance (km)" fill="#22c55e" />
+                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
                 <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
                 <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
               </ComposedChart>

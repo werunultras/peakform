@@ -161,6 +161,15 @@ export default function Page() {
 
   async function copyPrompt() { try { await navigator.clipboard.writeText(endOfDayPrompt); alert('Prompt copied'); } catch {} }
 
+  useEffect(() => {
+  if (userEmail) {
+    document.body.classList.add('peakform-bg');
+    return () => document.body.classList.remove('peakform-bg');
+  } else {
+    document.body.classList.remove('peakform-bg');
+  }
+}, [userEmail]);
+  
   // ---------- TXT import (inside component) ----------
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
     const lines = txt.split(/\r?\n/);

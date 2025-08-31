@@ -355,6 +355,10 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         </div>
       </div>
 
+{/* Spacer (1/7) */}
+        <div className="md:col-span-2" />
+      </div>
+      
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Run</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

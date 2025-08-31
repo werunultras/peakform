@@ -156,17 +156,14 @@ export default function Page() {
       '',
       `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
     ].filter(Boolean);
-    return (lines as string[]).join('
-');
+    return (lines as string[]).join('\n');
   }, [entry]);
 
   async function copyPrompt() { try { await navigator.clipboard.writeText(endOfDayPrompt); alert('Prompt copied'); } catch {} }
 
   // ---------- TXT import (inside component) ----------
   function parseDiaryTxt(txt: string): { date: string; entry: Entry; calorieTarget?: number } {
-    const lines = txt.split(/
-?
-/);
+    const lines = txt.split(/\r?\n/);
     const map: Record<string, string> = {};
     for (const raw of lines) {
       const line = raw.trim();

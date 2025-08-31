@@ -44,3 +44,33 @@ body.peakform-bg header nav .btn {
 body.peakform-bg header nav .btn:hover {
   background-color: rgba(255, 255, 255, 0.1); /* subtle hover */
 }
+/* Full-page background for the home hero */
+body.hero-bg {
+  background-image: url("/background.jpg"); /* canoe photo in /public */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Subtle dark overlay for readability across the whole page (under all content) */
+body.hero-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0,0,0,.45);
+}
+
+/* Invert the header to white on the hero page */
+body.hero-bg header,
+body.hero-bg header * {
+  color: #fff !important;
+}
+
+body.hero-bg header .btn {
+  border-color: #fff !important;
+}
+
+body.hero-bg header .btn:hover {
+  background: rgba(255,255,255,.10);
+}

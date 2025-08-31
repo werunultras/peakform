@@ -159,7 +159,7 @@ export default function Page() {
       `• Calories: ${n.calories || '—'}`,
       `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
       '',
-      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q${m.sleepQuality || '—'}/5`,
+      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q ${m.sleepQuality || '—'}/5`,
     ].filter(Boolean);
     return (lines as string[]).join('\n');
   }, [entry]);

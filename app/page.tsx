@@ -338,10 +338,11 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
             {userEmail}
           </div>
         </div>
-    
+
         {/* Spacer (1/7) */}
-        <div className="md:col-span-1" />
-      </div>
+            <div className="md:col-span-1" />
+          </div> {/* closes grid */}
+        </div>   {/* closes .card */}
     
       {/* Import card */}
       <div className="card">
@@ -349,9 +350,20 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         <div className="flex items-center gap-3 text-sm">
           <label className="btn cursor-pointer">
             Select .txt file
-            <input type="file" accept=".txt" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleImportTxt(f); e.currentTarget.value = ''; }} />
+            <input
+              type="file"
+              accept=".txt"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleImportTxt(f);
+                e.currentTarget.value = '';
+              }}
+            />
           </label>
-          <div className="text-neutral-600">Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).</div>
+          <div className="text-neutral-600">
+            Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
+          </div>
         </div>
       </div>
       

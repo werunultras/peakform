@@ -339,13 +339,11 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
           </div>
         </div>
 
-        {/* Spacer (1/7) */}
-            <div className="md:col-span-1" />
-          </div> {/* closes grid */}
-        </div>   {/* closes .card */}
-    
-      {/* Import card */}
-      <div className="card">
+        <div className="md:col-span-1" />
+      </div>
+    </div>
+
+    <div className="card">
         <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
         <div className="flex items-center gap-3 text-sm">
           <label className="btn cursor-pointer">

@@ -29,12 +29,6 @@ export default function Home() {
       }}
     >
       <div className="min-h-screen bg-black/45">
-        <header className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
-          <div className="text-white text-xl font-semibold tracking-tight">PeakForm</div>
-          <nav className="flex items-center gap-3">
-            <Link href="/login" className="btn whitespace-nowrap border-white text-white hover:bg-white/10">Login</Link>
-          </nav>
-        </header>
 
         <main className="flex-1 flex items-center">
           <div className="mx-auto max-w-4xl px-6 text-center">

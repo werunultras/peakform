@@ -96,14 +96,6 @@ export default function Page() {
     void pushSettings(newSettings);
   }
   
-    async function handleLogout() {
-  await supabase.auth.signOut();
-  setUserEmail(null);
-  setEntries({});
-  setSettings(defaultSettings);
-  document.body.classList.remove('peakform-bg');
-}
-  
   const totals = useMemo(() => {
     const n = entry.nutrition;
     const cals = toNum(n.calories);

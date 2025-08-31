@@ -304,6 +304,26 @@ export default function Page() {
         </div>
       </div>
 
+    <div className="card space-y-3">
+        <h3 className="text-lg font-medium">Mindset</h3>
+      
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {range('Mood (1–5)', 'mindset.mood', entry.mindset.mood, update)}
+          {range('Stress (1–5)', 'mindset.stress', entry.mindset.stress, update)}
+          {range('Sleep Quality (1–5)', 'mindset.sleepQuality', entry.mindset.sleepQuality, update)}
+        </div>
+      
+        <div>
+          <div className="label">Notes</div>
+          <textarea
+            className="input h-28"
+            value={entry.mindset.notes || ''}
+            onChange={(e) => update('mindset.notes', e.target.value)}
+            placeholder="Reflections, soreness, stressors, wins…"
+          />
+        </div>
+      </div>
+
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Today — Summary</h3>
@@ -333,7 +353,7 @@ export default function Page() {
                 <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#22c55e" />
+                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#FFA500" />
                 <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
                 <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
               </ComposedChart>

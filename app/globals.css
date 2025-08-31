@@ -14,7 +14,11 @@ html, body {
 
 /* Default card style */
 .card {
-  @apply rounded-2xl border bg-white p-5 shadow-sm;
+  @apply rounded-2xl border p-5 shadow-sm;
+  background-color: rgba(255, 255, 255, 0.1); /* light translucent background */
+  backdrop-filter: blur(8px);                 /* frosted effect */
+  -webkit-backdrop-filter: blur(8px);         /* Safari support */
+  border-color: rgba(255, 255, 255, 0.15);    /* subtle translucent border */
 }
 
 /* Default input style */

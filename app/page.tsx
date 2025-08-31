@@ -148,7 +148,7 @@ export default function Page() {
       r.cadence || r.strideM ? `  Cadence/Stride: ${fmt(r.cadence, 'spm')} · ${fmt(r.strideM, 'm')}` : null,
       r.elevUp || r.elevDown ? `  Elevation: +${fmt(r.elevUp, 'm')} / −${fmt(r.elevDown, 'm')}` : null,
       r.calories || r.sweatLossL ? `  Calories: ${fmt(r.calories, 'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL, 'L')}` : null,
-      s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''} ${s.calories ? `— ~${s.calories} kcal (est.)` : ''}` : null,
+      s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.weightLbs ? ` — ${s.weightLbs} lbs` : ''} ${s.rounds ? `(${s.rounds} rounds)` : ''} ${s.calories ? `— ~${s.calories} kcal (est.)` : ''}` : null,
       '',
       'Nutrition',
       `• Calories: ${n.calories || '—'}`,
@@ -194,7 +194,7 @@ export default function Page() {
       sweatLossL: map['SWEAT_LOSS_L'],
     };
 
-    const strength = { description: map['STRENGTH_DESC'], rounds: map['STRENGTH_ROUNDS'], calories: map['STRENGTH_KCAL'] };
+    const strength = { description: map['STRENGTH_DESC'], weightLbs: map['STRENGTH_WEIGHT_LBS'], rounds: map['STRENGTH_ROUNDS'], calories: map['STRENGTH_KCAL'] };
 
     const nutrition = { calories: map['CALORIES'], carbsG: map['CARBS_G'], proteinG: map['PROTEIN_G'], fatG: map['FAT_G'], fibreG: map['FIBRE_G'] };
 
@@ -386,6 +386,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {text('Description', 'workout.strength.description', entry.workout.strength.description, update)}
           {num('Rounds', 'workout.strength.rounds', entry.workout.strength.rounds, update)}
+          {num('Weight (lbs)', 'workout.strength.weightLbs', entry.workout.strength.weightLbs, update)}
           {num('Calories (est.)', 'workout.strength.calories', entry.workout.strength.calories, update)}
         </div>
       </div>

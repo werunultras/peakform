@@ -340,7 +340,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         </div>
     
         {/* Spacer (1/7) */}
-        <div className="md:col-span-2" />
+        <div className="md:col-span-1" />
       </div>
     
       {/* Import card */}
@@ -353,10 +353,6 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
           </label>
           <div className="text-neutral-600">Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).</div>
         </div>
-      </div>
-
-{/* Spacer (1/7) */}
-        <div className="md:col-span-2" />
       </div>
       
       <div className="card space-y-3">

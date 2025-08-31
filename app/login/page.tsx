@@ -4,6 +4,11 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
+useEffect(() => {
+  document.body.classList.add('hero-bg');
+  return () => document.body.classList.remove('hero-bg');
+}, []);
+
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');

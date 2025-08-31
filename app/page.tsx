@@ -297,8 +297,6 @@ export default function Page() {
           {num('Fat (g)','nutrition.fatG',n.fatG,update)}
           {num('Fibre (g)','nutrition.fibreG',n.fibreG,update)}
         </div>
-        <div className="text-sm text-neutral-600">Targets — Carbs {settings.macroTargets.carbsG}g · Protein {settings.macroTargets.proteinG}g · Fat {settings.macroTargets.fatG}g · Fibre {settings.macroTargets.fibreG}g</div>
-      </div>
 
       <div className="grid-2">
         <div className="card space-y-2">

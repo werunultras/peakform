@@ -298,59 +298,51 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   const n = entry.nutrition;
 
   return (
-    <div className="space-y-6">
-      <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-start">
-          {/* Date (1/7) */}
-          <div className="md:col-span-1">
-            <div className="label">Date</div>
-            <input
-              className="input h-10"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-        
-          {/* Streak (1/7, stays narrow) */}
-          <div className="md:col-span-1">
-            <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold">
-              {streak} {streak === 1 ? 'day' : 'days'}
-            </div>
-          </div>
-        
-    //      {/* Daily calorie target + Clear Day (2/7) */}
-    //      <div className="md:col-span-2">
-    //        <div className="label">Daily calorie target</div>
-    //        <div className="flex items-center gap-2">
-    //          <input
-    //            className="input h-10 w-full"
-    //            type="number"
-    //            value={settings.calorieTarget}
-    //            onChange={(e) =>
-    //              saveSettings({ calorieTarget: Number(e.target.value || 0) })
-    //            }
-    //          />
-              <button
-                type="button"
-                className="btn h-10 whitespace-nowrap px-3"
-                onClick={handleClearDay}
-              >
-                Clear Day
-              </button>
-            </div>
-    //    </div>
-        
-          {/* Signed in (remaining 3/7) */}
-          <div className="md:col-span-3">
-            <div className="label">Signed in as</div>
-            <div className="text-sm text-neutral-600 h-10 flex items-center">
-              {userEmail}
-            </div>
+    <div className="card">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-start">
+        {/* Date (1/7) */}
+        <div className="md:col-span-1">
+          <div className="label">Date</div>
+          <input
+            className="input h-10"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+    
+        {/* Streak (1/7) */}
+        <div className="md:col-span-1">
+          <div className="label">Streak</div>
+          <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold">
+            {streak} {streak === 1 ? 'day' : 'days'}
           </div>
         </div>
+    
+        {/* Optional Clear Day column (1/7). If you want Clear Day elsewhere, leave this <div/> empty */}
+        <div className="md:col-span-1">
+          <div className="label">&nbsp;</div>
+          <button
+            type="button"
+            className="btn h-10 whitespace-nowrap px-3"
+            onClick={handleClearDay}
+          >
+            Clear Day
+          </button>
+        </div>
+    
+        {/* Signed in (3/7) */}
+        <div className="md:col-span-3">
+          <div className="label">Signed in as</div>
+          <div className="text-sm text-neutral-600 h-10 flex items-center">
+            {userEmail}
+          </div>
+        </div>
+    
+        {/* Spacer (1/7) */}
+        <div className="md:col-span-1" />
       </div>
+    </div>
 
       {/* Import card */}
       <div className="card">
@@ -393,8 +385,9 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Nutrition</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {/* Daily calorie target now here */}
+      
+        {/* Row 1: Target + Calories (2 columns) */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="label">Daily calorie target</div>
             <input
@@ -407,12 +400,19 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
             />
           </div>
           {num('Calories', 'nutrition.calories', n.calories, update)}
+        </div>
+      
+        {/* Row 2: Macros (4 columns) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {num('Carbs (g)', 'nutrition.carbsG', n.carbsG, update)}
           {num('Protein (g)', 'nutrition.proteinG', n.proteinG, update)}
           {num('Fat (g)', 'nutrition.fatG', n.fatG, update)}
           {num('Fibre (g)', 'nutrition.fibreG', n.fibreG, update)}
         </div>
-        <div className="text-sm text-neutral-600">Targets — Carbs {settings.macroTargets.carbsG}g · Protein {settings.macroTargets.proteinG}g · Fat {settings.macroTargets.fatG}g · Fibre {settings.macroTargets.fibreG}g</div>
+      
+        <div className="text-sm text-neutral-600">
+          Targets — Carbs {settings.macroTargets.carbsG}g · Protein {settings.macroTargets.proteinG}g · Fat {settings.macroTargets.fatG}g · Fibre {settings.macroTargets.fibreG}g
+        </div>
       </div>
 
       <div className="card space-y-3">

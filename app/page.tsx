@@ -340,7 +340,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
                 Clear Day
               </button>
             </div>
-          </div>
+    //    </div>
         
           {/* Signed in (remaining 3/7) */}
           <div className="md:col-span-3">

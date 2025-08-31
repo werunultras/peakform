@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="mb-6 flex items-center justify-between">
             <h1 className="text-2xl font-semibold tracking-tight">PeakForm</h1>
             <nav className="flex items-center gap-3 text-sm">
-              <Link className="btn" href="/">Diary</Link>
+              <Link className="btn" href="/diary">Diary</Link>
               <Link className="btn" href="/login">Login</Link>
             </nav>
           </header>

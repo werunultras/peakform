@@ -297,6 +297,7 @@ export default function Page() {
           {num('Fat (g)','nutrition.fatG',n.fatG,update)}
           {num('Fibre (g)','nutrition.fibreG',n.fibreG,update)}
         </div>
+      </div>
 
       <div className="grid-2">
         <div className="card space-y-2">

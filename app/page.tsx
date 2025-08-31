@@ -385,8 +385,8 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         <h3 className="text-lg font-medium">Strength</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {text('Description', 'workout.strength.description', entry.workout.strength.description, update)}
-          {num('Rounds', 'workout.strength.rounds', entry.workout.strength.rounds, update)}
           {num('Weight (lbs)', 'workout.strength.weightLbs', entry.workout.strength.weightLbs, update)}
+          {num('Rounds', 'workout.strength.rounds', entry.workout.strength.rounds, update)}
           {num('Calories (est.)', 'workout.strength.calories', entry.workout.strength.calories, update)}
         </div>
       </div>

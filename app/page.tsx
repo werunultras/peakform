@@ -320,18 +320,18 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
             </div>
           </div>
         
-          {/* Daily calorie target + Clear Day (2/7) */}
-          <div className="md:col-span-2">
-            <div className="label">Daily calorie target</div>
-            <div className="flex items-center gap-2">
-              <input
-                className="input h-10 w-full"
-                type="number"
-                value={settings.calorieTarget}
-                onChange={(e) =>
-                  saveSettings({ calorieTarget: Number(e.target.value || 0) })
-                }
-              />
+    //      {/* Daily calorie target + Clear Day (2/7) */}
+    //      <div className="md:col-span-2">
+    //        <div className="label">Daily calorie target</div>
+    //        <div className="flex items-center gap-2">
+    //          <input
+    //            className="input h-10 w-full"
+    //            type="number"
+    //            value={settings.calorieTarget}
+    //            onChange={(e) =>
+    //              saveSettings({ calorieTarget: Number(e.target.value || 0) })
+    //            }
+    //          />
               <button
                 type="button"
                 className="btn h-10 whitespace-nowrap px-3"
@@ -393,7 +393,19 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Nutrition</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {/* Daily calorie target now here */}
+          <div>
+            <div className="label">Daily calorie target</div>
+            <input
+              className="input"
+              type="number"
+              value={settings.calorieTarget}
+              onChange={(e) =>
+                saveSettings({ calorieTarget: Number(e.target.value || 0) })
+              }
+            />
+          </div>
           {num('Calories', 'nutrition.calories', n.calories, update)}
           {num('Carbs (g)', 'nutrition.carbsG', n.carbsG, update)}
           {num('Protein (g)', 'nutrition.proteinG', n.proteinG, update)}

@@ -54,3 +54,12 @@ body.hero-bg header .btn {
 body.hero-bg header .btn:hover {
   background: rgba(255,255,255,.10);
 }
+
+/* Subtle full-page background for the logged-in diary */
+body.app-bg {
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(0,0,0,.04), rgba(0,0,0,0)),
+    radial-gradient(1000px 500px at 120% 110%, rgba(0,0,0,.03), rgba(0,0,0,0)),
+    #f7f7f8; /* base */
+  background-attachment: fixed;
+}

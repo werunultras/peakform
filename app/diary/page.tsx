@@ -183,6 +183,53 @@ export default function Page() {
     return days;
   }, [entries]);
 
+  // Rolling 7-day distance (km)
+  const rolling7DistanceData = useMemo(() => {
+    const days = [...Array(14)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (13 - i));
+      // sum distance for today and previous 6 days
+      let sum = 0;
+      for (let k = 0; k < 7; k++) {
+        const dd = new Date(d);
+        dd.setDate(dd.getDate() - k);
+        const key = dd.toISOString().slice(0, 10);
+        const e = entries[key];
+        sum += e ? toNum(e.workout?.run?.distanceKm) : 0;
+      }
+      return { date: d.toISOString().slice(5, 10), rolling7: sum };
+    });
+    return days;
+  }, [entries]);
+
+  // Macro composition (100% stacked by calories)
+  const macrosPctData = useMemo(() => {
+    const days = [...Array(14)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (13 - i));
+      const key = d.toISOString().slice(0, 10);
+      const e = entries[key];
+      const carbsG   = e ? toNum(e.nutrition?.carbsG)   : 0;
+      const proteinG = e ? toNum(e.nutrition?.proteinG) : 0;
+      const fatG     = e ? toNum(e.nutrition?.fatG)     : 0;
+      const cC = carbsG * 4, cP = proteinG * 4, cF = fatG * 9;
+      const total = cC + cP + cF;
+      const carbsPct   = total ? (cC / total) * 100 : 0;
+      const proteinPct = total ? (cP / total) * 100 : 0;
+      const fatPct     = total ? (cF / total) * 100 : 0;
+      return {
+        date: d.toISOString().slice(5, 10),
+        carbsPct,
+        proteinPct,
+        fatPct,
+        carbsG,
+        proteinG,
+        fatG,
+      };
+    });
+    return days;
+  }, [entries]);
+
   const endOfDayPrompt = useMemo(() => {
     const r = entry.workout.run; const s = entry.workout.strength; const n = entry.nutrition; const m = entry.mindset;
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
@@ -356,6 +403,45 @@ export default function Page() {
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
                 <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
                 <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid-2">
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Rolling 7-day Distance</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={rolling7DistanceData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tickMargin={6} />
+                <YAxis domain={[0, 'auto']} />
+                <Tooltip formatter={(v) => [Math.round(Number(v)), 'km']} />
+                <Bar dataKey="rolling7" name="Rolling 7-day" fill="#3b82f6" radius={[6,6,0,0]} barSize={18} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tickMargin={6} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                <Tooltip
+                  formatter={(value: any, name: any, { payload }: any) => {
+                    const m = String(name).toLowerCase();
+                    const grams = m.includes('carb') ? payload.carbsG : m.includes('protein') ? payload.proteinG : m.includes('fat') ? payload.fatG : null;
+                    return [`${Math.round(Number(value))}%${grams != null ? ` (${grams}g)` : ''}`, name];
+                  }}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" radius={[6,6,0,0]} />
+                <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
+                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

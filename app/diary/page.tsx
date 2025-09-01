@@ -44,12 +44,11 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const fmtNum = (v: number) => (Number.isFinite(v) ? new Intl.NumberFormat().format(v) : '—');
 const toNum = (v: any) => { const n = Number(String(v ?? '').replace(/[^0-9.-]/g, '')); return Number.isFinite(n) ? n : 0; };
-// Format YYYY-MM-DD -> MM/DD/YY
+// Format YYYY-MM-DD -> MM/DD/YYYY
 const formatMDY = (iso: string) => {
   if (!iso || iso.length < 10) return '';
   const [y, m, d] = iso.split('-');
-  const yy = y.slice(-2);
-  return `${m}/${d}/${yy}`;
+  return `${m}/${d}/${y}`; // MM/DD/YYYY
 };
 // Parse MM/DD/YY or MM/DD/YYYY -> YYYY-MM-DD (fallback to today if invalid)
 const toISOFromMDY = (s: string) => {
@@ -271,10 +270,10 @@ export default function Page() {
           <div className="md:col-span-2">
             <div className="label">Date</div>
             <input
-              className="input h-10 w-full max-w-[140px] tabular-nums"
+              className="input h-10 w-full max-w-[160px] tabular-nums"
               type="text"
               inputMode="numeric"
-              placeholder="MM/DD/YY"
+              placeholder="MM/DD/YYYY"
               value={formatMDY(date)}
               onChange={(e) => setDate(toISOFromMDY(e.target.value))}
             />
@@ -282,7 +281,7 @@ export default function Page() {
 
           {/* Actions (Today, Streak, Clear Day, Import) — consistent gap */}
           <div className="md:col-span-7">
-            <div className="label">Streak;</div>
+            <div className="label">Streak</div>
             <div className="flex items-center gap-4 flex-wrap">
               <div className="h-10 rounded-xl border px-3 flex items-center justify-center text-sm font-semibold bg-white shadow-sm tabular-nums leading-none">{streak} {streak===1?'day':'days'}</div>
               <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={() => setDate(todayISO())}>Today</button>
@@ -319,9 +318,9 @@ export default function Page() {
           <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
           <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
           <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
-          <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
-          <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
-          <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
+          <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} />
+          <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} />
+          <Stat label="Fat (g)" value={fmtNum(totals.fatG)} />
         </div>
         <div className="text-sm">
           Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}

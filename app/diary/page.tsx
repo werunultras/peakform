@@ -351,7 +351,6 @@ export default function Page() {
                 <XAxis dataKey="date" tickMargin={6} />
                 <YAxis domain={[0, 'auto']} />
                 <Tooltip />
-                <Legend />
                 <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </ComposedChart>
             </ResponsiveContainer>

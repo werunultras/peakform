@@ -143,6 +143,24 @@ export default function Page() {
     return days;
   }, [entries]);
 
+  const calorieDeltaData = useMemo(() => {
+    const days = [...Array(14)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (13 - i));
+      const key = d.toISOString().slice(0, 10);
+      const e = entries[key];
+      const cals = e ? toNum(e.nutrition?.calories) : 0;
+      const target = settings.calorieTarget || 0;
+      const delta = cals - target; // >0 surplus, <0 deficit
+      return {
+        date: key.slice(5),
+        surplus: delta > 0 ? delta : 0,
+        deficit: delta < 0 ? delta : 0,
+      };
+    });
+    return days;
+  }, [entries, settings.calorieTarget]);
+
   const endOfDayPrompt = useMemo(() => {
     const r = entry.workout.run; const s = entry.workout.strength; const n = entry.nutrition; const m = entry.mindset;
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
@@ -324,25 +342,29 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid-2">
-        <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Today — Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-            <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
-            <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
-            <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
-          </div>
-          <div className="text-sm">Status: <span className="font-medium capitalize">{totals.balance}</span> {totals.deficit > 0 ? `(${fmtNum(totals.deficit)} kcal below target)` : totals.deficit < 0 ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)` : '(on target)'}
-          </div>
+      <div className="card space-y-2">
+        <h3 className="text-lg font-medium">Today — Summary</h3>
+        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 text-sm">
+          <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+          <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+          <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
+          <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
+          <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
+          <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
+          <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
+          <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />
         </div>
+        <div className="text-sm">
+          Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
+          {totals.deficit > 0
+            ? `(${fmtNum(totals.deficit)} kcal below target)`
+            : totals.deficit < 0
+            ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
+            : '(on target)'}
+        </div>
+      </div>
 
+      <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Distance</h3>
           <div className="h-56">
@@ -352,6 +374,21 @@ export default function Page() {
                 <YAxis domain={[0, 'auto']} />
                 <Tooltip />
                 <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">14-day trend — Calorie Δ</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={calorieDeltaData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tickMargin={6} />
+                <YAxis domain={['auto', 'auto']} />
+                <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
+                <Bar dataKey="deficit" name="Deficit" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="surplus" name="Surplus" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

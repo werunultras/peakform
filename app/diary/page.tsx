@@ -344,18 +344,15 @@ export default function Page() {
         </div>
 
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">14-day trend — Calories & Distance</h3>
+          <h3 className="text-lg font-medium">14-day trend — Distance</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tickMargin={6} />
-                <YAxis yAxisId="left" domain={[0, 'auto']} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} />
+                <YAxis domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="distance" name="Distance" fill="#FFA500" />
-                <ReferenceLine yAxisId="right" y={settings.calorieTarget} strokeDasharray="4 4" />
-                <Line yAxisId="right" type="monotone" dataKey="calories" name="Calories" strokeWidth={2} dot={false} />
+                <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

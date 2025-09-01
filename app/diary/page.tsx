@@ -170,19 +170,18 @@ export default function Page() {
     return days;
   }, [entries]);
 
-  const calorieDeltaData = useMemo(() => {
+  const caloriesVsTargetData = useMemo(() => {
     const days = [...Array(14)].map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (13 - i));
       const key = d.toISOString().slice(0, 10);
       const e = entries[key];
-      const cals = e ? toNum(e.nutrition?.calories) : 0;
+      const calories = e ? toNum(e.nutrition?.calories) : 0;
       const target = e ? toNum(e.nutrition?.calorieTarget) : 0;
-      const delta = cals - target;
-      return { date: key.slice(5), surplus: delta > 0 ? delta : 0, deficit: delta < 0 ? delta : 0 };
+      return { date: key.slice(5), calories, target };
     });
     return days;
-  }, [entries]); 
+  }, [entries]);
 
   const endOfDayPrompt = useMemo(() => {
     const r = entry.workout.run; const s = entry.workout.strength; const n = entry.nutrition; const m = entry.mindset;
@@ -348,15 +347,15 @@ export default function Page() {
         </div>
 
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">14-day trend — Calorie Δ</h3>
+          <h3 className="text-lg font-medium">14-day trend — Calories vs Target</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={calorieDeltaData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+              <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
                 <XAxis dataKey="date" tickMargin={6} />
-                <YAxis domain={['auto', 'auto']} />
+                <YAxis domain={[0, 'auto']} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
-                <Bar dataKey="deficit" name="Deficit" fill="#ef4444" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="surplus" name="Surplus" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
+                <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

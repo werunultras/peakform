@@ -4,7 +4,7 @@ export type Run = {
   elevUp?: string; elevDown?: string; calories?: string; sweatLossL?: string;
 };
 export type Strength = { description?: string; weightLbs?: string; rounds?: string; calories?: string };
-export type Nutrition = { calories?: string; carbsG?: string; proteinG?: string; fatG?: string; fibreG?: string };
+export type Nutrition = { calorieTarget?: string; calories?: string; carbsG?: string; proteinG?: string; fatG?: string; fibreG?: string };
 export type Mindset = { mood?: string; stress?: string; sleepQuality?: string; notes?: string };
 
 export type Entry = {

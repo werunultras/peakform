@@ -248,9 +248,9 @@ export default function Page() {
     <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-8 gap-4 items-start">
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <div className="label">Date</div>
-            <input className="input h-10 w-full min-w-[180px]" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <input className="input h-10 w-full max-w-[180px]" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
@@ -279,7 +279,7 @@ export default function Page() {
               />
             </label>
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
           </div>

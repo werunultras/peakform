@@ -266,8 +266,9 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-8 gap-4 items-start">
-          <div className="md:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+          {/* Date (2/12) */}
+          <div className="md:col-span-2">
             <div className="label">Date</div>
             <input
               className="input h-10 w-full max-w-[140px] tabular-nums"
@@ -278,33 +279,30 @@ export default function Page() {
               onChange={(e) => setDate(toISOFromMDY(e.target.value))}
             />
           </div>
-          <div className="md:col-span-1">
+
+          {/* Actions (Today, Streak, Clear Day, Import) — consistent gap */}
+          <div className="md:col-span-7">
             <div className="label">&nbsp;</div>
-            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={() => setDate(todayISO())}>Today</button>
+            <div className="flex items-center gap-4 flex-wrap">
+              <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={() => setDate(todayISO())}>Today</button>
+              <div className="h-10 rounded-xl border px-3 flex items-center justify-center text-sm font-semibold bg-white shadow-sm tabular-nums leading-none">{streak} {streak===1?'day':'days'}</div>
+              <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={handleClearDay}>Clear Day</button>
+              <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer inline-flex items-center bg-white shadow-sm">Import .txt file
+                <input
+                  type="file"
+                  accept=".txt"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void handleImportTxt(f);
+                    e.currentTarget.value = '';
+                  }}
+                />
+              </label>
+            </div>
           </div>
-          <div className="md:col-span-1">
-            <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center justify-center text-sm font-semibold bg-white shadow-sm tabular-nums leading-none">{streak} {streak===1?'day':'days'}</div>
-          </div>
-          <div className="md:col-span-1">
-            <div className="label">&nbsp;</div>
-            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={handleClearDay}>Clear Day</button>
-          </div>
-          <div className="md:col-span-1">
-            <div className="label">&nbsp;</div>
-            <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer inline-flex items-center bg-white shadow-sm">Import .txt file
-              <input
-                type="file"
-                accept=".txt"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) void handleImportTxt(f);
-                  e.currentTarget.value = '';
-                }}
-              />
-            </label>
-          </div>
+
+          {/* Signed in (3/12) */}
           <div className="md:col-span-3">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>

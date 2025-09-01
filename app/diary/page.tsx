@@ -104,19 +104,28 @@ export default function Page() {
       nutrition: {},
       mindset: { mood: '3', stress: '3', sleepQuality: '3', notes: '' },
     };
+    cleared.nutrition.calorieTarget = '0';
     setEntries(prev => ({ ...prev, [date]: cleared }));
     void pushEntry(date, cleared);
-    const newSettings = { ...settings, calorieTarget: 0 };
-    setSettings(newSettings);
-    void pushSettings(newSettings);
   }
 
   const totals = useMemo(() => {
     const n = entry.nutrition;
     const cals = toNum(n.calories);
-    const deficit = settings.calorieTarget ? settings.calorieTarget - cals : 0;
-    const balance = deficit === 0 ? 'balance' : deficit > 0 ? 'deficit' : 'surplus';
-    return { calories: cals, carbsG: toNum(n.carbsG), proteinG: toNum(n.proteinG), fatG: toNum(n.fatG), fibreG: toNum(n.fibreG), deficit, balance };
+    // day-specific target; fall back to global only if not set on the day
+    const dayTarget = toNum(n.calorieTarget) || (settings.calorieTarget ? Number(settings.calorieTarget) : 0);
+    const deficit = dayTarget ? (dayTarget - cals) : 0;
+    const balance = deficit === 0 ? 'balance' : (deficit > 0 ? 'deficit' : 'surplus');
+    return {
+      calories: cals,
+      carbsG: toNum(n.carbsG),
+      proteinG: toNum(n.proteinG),
+      fatG: toNum(n.fatG),
+      fibreG: toNum(n.fibreG),
+      deficit,
+      balance,
+      dayTarget,
+    };
   }, [entry, settings]);
 
   const streak = useMemo(() => {
@@ -150,16 +159,12 @@ export default function Page() {
       const key = d.toISOString().slice(0, 10);
       const e = entries[key];
       const cals = e ? toNum(e.nutrition?.calories) : 0;
-      const target = settings.calorieTarget || 0;
-      const delta = cals - target; // >0 surplus, <0 deficit
-      return {
-        date: key.slice(5),
-        surplus: delta > 0 ? delta : 0,
-        deficit: delta < 0 ? delta : 0,
-      };
+      const target = e ? toNum(e.nutrition?.calorieTarget) : 0;
+      const delta = cals - target;
+      return { date: key.slice(5), surplus: delta > 0 ? delta : 0, deficit: delta < 0 ? delta : 0 };
     });
     return days;
-  }, [entries, settings.calorieTarget]);
+  }, [entries]); 
 
   const endOfDayPrompt = useMemo(() => {
     const r = entry.workout.run; const s = entry.workout.strength; const n = entry.nutrition; const m = entry.mindset;
@@ -174,7 +179,7 @@ export default function Page() {
       s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''}${s.weightLbs ? ` — ${s.weightLbs} lbs` : ''}${s.calories ? ` — ~${s.calories} kcal (est.)` : ''}` : null,
       '',
       'Nutrition',
-      `• Calories: ${n.calories || '—'}`,
+      `• Calories: ${n.calories || '—'}`, `• Target: ${n.calorieTarget || '—'} kcal`,
       `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
       '',
       `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep Q ${m.sleepQuality || '—'}/5`,
@@ -209,7 +214,7 @@ export default function Page() {
     const parsedDate = map['DATE'] || todayISO();
     const run = { distanceKm: map['DIST_KM'], durationMin: map['DURATION_MIN'], pace: map['PACE'], hrAvg: map['HR_AVG'], hrMax: map['HR_MAX'], cadence: map['CADENCE'], strideM: map['STRIDE_M'], elevUp: map['ELEV_UP'], elevDown: map['ELEV_DOWN'], calories: map['KCAL_RUN'], sweatLossL: map['SWEAT_LOSS_L'] };
     const strength = { description: map['STRENGTH_DESC'], rounds: map['STRENGTH_ROUNDS'], calories: map['STRENGTH_KCAL'], weightLbs: map['STRENGTH_WEIGHT_LBS'] };
-    const nutrition = { calories: map['CALORIES'], carbsG: map['CARBS_G'], proteinG: map['PROTEIN_G'], fatG: map['FAT_G'], fibreG: map['FIBRE_G'] };
+    const nutrition = {calories: map['CALORIES'], carbsG: map['CARBS_G'], proteinG: map['PROTEIN_G'], fatG: map['FAT_G'], fibreG: map['FIBRE_G'], calorieTarget: map['CALORIE_TARGET'],};
     const mindset = { mood: map['MOOD'], stress: map['STRESS'], sleepQuality: map['SLEEP_QUALITY'], notes: map['NOTES'] };
     const entry: Entry = { date: parsedDate, workout: { run, strength }, nutrition, mindset };
     const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
@@ -223,11 +228,6 @@ export default function Page() {
     const { date: d, entry: imported, calorieTarget } = parseDiaryTxt(txt);
     setEntries(prev => ({ ...prev, [d]: { ...(prev[d] ?? emptyEntry(d)), ...imported } }));
     await pushEntry(d, imported);
-    if (typeof calorieTarget === 'number' && Number.isFinite(calorieTarget)) {
-      const newSettings = { ...settings, calorieTarget };
-      setSettings(newSettings);
-      await pushSettings(newSettings);
-    }
     alert(`Imported diary for ${d}`);
   }
 
@@ -308,10 +308,7 @@ export default function Page() {
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Nutrition</h3>
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <div className="label">Daily calorie target</div>
-            <input className="input" type="number" value={settings.calorieTarget} onChange={(e)=>saveSettings({ calorieTarget: Number(e.target.value||0) })} />
-          </div>
+          {num('Daily calorie target','nutrition.calorieTarget',n.calorieTarget,update)}
           {num('Calories','nutrition.calories',n.calories,update)}
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -349,7 +346,7 @@ export default function Page() {
           <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
           <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
           <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
-          <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(settings.calorieTarget)}`} />
+          <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
           <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub={`Target ${settings.macroTargets.carbsG}`} />
           <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub={`Target ${settings.macroTargets.proteinG}`} />
           <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub={`Target ${settings.macroTargets.fatG}`} />

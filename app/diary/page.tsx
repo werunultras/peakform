@@ -247,10 +247,20 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-8 gap-4 items-start">
           <div className="md:col-span-1">
             <div className="label">Date</div>
             <input className="input h-10" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="md:col-span-1">
+            <div className="label">&nbsp;</div>
+            <button
+              type="button"
+              className="btn h-10 whitespace-nowrap px-3"
+              onClick={() => setDate(todayISO())}
+            >
+              Today
+            </button>
           </div>
           <div className="md:col-span-1">
             <div className="label">Streak</div>

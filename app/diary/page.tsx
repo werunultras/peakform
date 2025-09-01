@@ -280,19 +280,19 @@ export default function Page() {
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
-            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center" onClick={() => setDate(todayISO())}>Today</button>
+            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={() => setDate(todayISO())}>Today</button>
           </div>
           <div className="md:col-span-1">
             <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center justify-center text-sm font-semibold">{streak} {streak===1?'day':'days'}</div>
+            <div className="h-10 rounded-xl border px-3 flex items-center justify-center text-sm font-semibold bg-white shadow-sm tabular-nums leading-none">{streak} {streak===1?'day':'days'}</div>
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
-            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center" onClick={handleClearDay}>Clear Day</button>
+            <button type="button" className="btn h-10 whitespace-nowrap px-3 inline-flex items-center bg-white shadow-sm" onClick={handleClearDay}>Clear Day</button>
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
-            <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer inline-flex items-center">Import .txt file
+            <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer inline-flex items-center bg-white shadow-sm">Import .txt file
               <input
                 type="file"
                 accept=".txt"

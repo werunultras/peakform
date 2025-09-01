@@ -44,6 +44,25 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const fmtNum = (v: number) => (Number.isFinite(v) ? new Intl.NumberFormat().format(v) : '—');
 const toNum = (v: any) => { const n = Number(String(v ?? '').replace(/[^0-9.-]/g, '')); return Number.isFinite(n) ? n : 0; };
+// Format YYYY-MM-DD -> MM/DD/YY
+const formatMDY = (iso: string) => {
+  if (!iso || iso.length < 10) return '';
+  const [y, m, d] = iso.split('-');
+  const yy = y.slice(-2);
+  return `${m}/${d}/${yy}`;
+};
+// Parse MM/DD/YY or MM/DD/YYYY -> YYYY-MM-DD (fallback to today if invalid)
+const toISOFromMDY = (s: string) => {
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (!m) return todayISO();
+  let [_, mm, dd, yy] = m;
+  if (yy.length === 2) yy = `20${yy}`; // assume 20xx for 2-digit year
+  const mmNum = Math.min(Math.max(parseInt(mm, 10), 1), 12);
+  const ddNum = Math.min(Math.max(parseInt(dd, 10), 1), 31);
+  const d = new Date(Number(yy), mmNum - 1, ddNum);
+  const iso = d.toISOString().slice(0, 10);
+  return iso;
+};
 
 export default function Page() {
   const [date, setDate] = useState<string>(todayISO());
@@ -248,9 +267,16 @@ export default function Page() {
     <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-8 gap-4 items-start">
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <div className="label">Date</div>
-            <input className="input h-10 w-full min-w-[220px]" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <input
+              className="input h-10 w-full max-w-[140px] tabular-nums"
+              type="text"
+              inputMode="numeric"
+              placeholder="MM/DD/YY"
+              value={formatMDY(date)}
+              onChange={(e) => setDate(toISOFromMDY(e.target.value))}
+            />
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
@@ -279,7 +305,7 @@ export default function Page() {
               />
             </label>
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
           </div>

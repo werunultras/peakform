@@ -256,7 +256,7 @@ export default function Page() {
             <div className="label">&nbsp;</div>
             <button
               type="button"
-              className="btn h-10 whitespace-nowrap px-3 bg-white"
+              className="btn h-10 whitespace-nowrap px-3"
               onClick={() => setDate(todayISO())}
             >
               Today
@@ -264,22 +264,38 @@ export default function Page() {
           </div>
           <div className="md:col-span-1">
             <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold bg-white">{streak} {streak===1?'day':'days'}</div>
+            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold">{streak} {streak===1?'day':'days'}</div>
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
-            <div className="flex items-center gap-2">
-              <button type="button" className="btn h-10 whitespace-nowrap px-3 bg-white" onClick={handleClearDay}>Clear Day</button>
-              <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer bg-white">Import .txt file
-                <input type="file" accept=".txt" className="hidden" onChange={(e)=>{const f=e.target.files?.[0]; if(f) void handleImportTxt(f); e.currentTarget.value='';}} />
-              </label>
-            </div>
+            <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>Clear Day</button>
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
           </div>
           <div className="md:col-span-1" />
+        </div>
+      </div>
+
+      <div className="card">
+        <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
+        <div className="flex items-center gap-3 text-sm">
+          <label className="btn cursor-pointer">Select .txt file
+            <input
+              type="file"
+              accept=".txt"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleImportTxt(f);
+                e.currentTarget.value = '';
+              }}
+            />
+          </label>
+          <div className="text-neutral-600">
+            Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
+          </div>
         </div>
       </div>
 

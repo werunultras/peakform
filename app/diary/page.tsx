@@ -248,19 +248,13 @@ export default function Page() {
     <div className="space-y-6">
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-8 gap-4 items-start">
-          <div className="md:col-span-1">
+          <div className="md:col-span-2">
             <div className="label">Date</div>
-            <input className="input h-10" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <input className="input h-10 w-full min-w-[180px]" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <div className="md:col-span-1">
             <div className="label">&nbsp;</div>
-            <button
-              type="button"
-              className="btn h-10 whitespace-nowrap px-3"
-              onClick={() => setDate(todayISO())}
-            >
-              Today
-            </button>
+            <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={() => setDate(todayISO())}>Today</button>
           </div>
           <div className="md:col-span-1">
             <div className="label">Streak</div>
@@ -270,34 +264,28 @@ export default function Page() {
             <div className="label">&nbsp;</div>
             <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>Clear Day</button>
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-1">
+            <div className="label">&nbsp;</div>
+            <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer">Import .txt file
+              <input
+                type="file"
+                accept=".txt"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void handleImportTxt(f);
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+          </div>
+          <div className="md:col-span-2">
             <div className="label">Signed in as</div>
             <div className="text-sm text-neutral-600 h-10 flex items-center">{userEmail}</div>
           </div>
-          <div className="md:col-span-1" />
         </div>
       </div>
 
-      <div className="card">
-        <h3 className="text-lg font-medium mb-3">Import from .txt</h3>
-        <div className="flex items-center gap-3 text-sm">
-          <label className="btn cursor-pointer">Select .txt file
-            <input
-              type="file"
-              accept=".txt"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void handleImportTxt(f);
-                e.currentTarget.value = '';
-              }}
-            />
-          </label>
-          <div className="text-neutral-600">
-            Format: KEY=VALUE per line (e.g., DATE=2025-08-30, DIST_KM=10, CALORIE_TARGET=2600 …).
-          </div>
-        </div>
-      </div>
 
       <div className="card space-y-2">
         <h3 className="text-lg font-medium">Today — Summary</h3>

@@ -32,7 +32,7 @@ function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
 }
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border p-3">
+    <div className="rounded-xl border p-3 bg-white">
       <div className="text-xs text-neutral-600">{label}</div>
       <div className="text-xl font-semibold tabular-nums">{value}</div>
       {sub && <div className="text-xs text-neutral-500">{sub}</div>}
@@ -256,7 +256,7 @@ export default function Page() {
             <div className="label">&nbsp;</div>
             <button
               type="button"
-              className="btn h-10 whitespace-nowrap px-3"
+              className="btn h-10 whitespace-nowrap px-3 bg-white"
               onClick={() => setDate(todayISO())}
             >
               Today
@@ -264,13 +264,13 @@ export default function Page() {
           </div>
           <div className="md:col-span-1">
             <div className="label">Streak</div>
-            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold">{streak} {streak===1?'day':'days'}</div>
+            <div className="h-10 rounded-xl border px-3 flex items-center text-sm font-semibold bg-white">{streak} {streak===1?'day':'days'}</div>
           </div>
           <div className="md:col-span-2">
             <div className="label">&nbsp;</div>
             <div className="flex items-center gap-2">
-              <button type="button" className="btn h-10 whitespace-nowrap px-3" onClick={handleClearDay}>Clear Day</button>
-              <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer">Import .txt file
+              <button type="button" className="btn h-10 whitespace-nowrap px-3 bg-white" onClick={handleClearDay}>Clear Day</button>
+              <label className="btn h-10 whitespace-nowrap px-3 cursor-pointer bg-white">Import .txt file
                 <input type="file" accept=".txt" className="hidden" onChange={(e)=>{const f=e.target.files?.[0]; if(f) void handleImportTxt(f); e.currentTarget.value='';}} />
               </label>
             </div>

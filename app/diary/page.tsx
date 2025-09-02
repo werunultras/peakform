@@ -375,12 +375,10 @@ export default function Page() {
           <div className="md:col-span-2">
             <div className="label">Date</div>
             <input
-              className="input h-10 w-full max-w-[160px] tabular-nums"
-              type="text"
-              inputMode="numeric"
-              placeholder="MM/DD/YYYY"
-              value={formatMDY(date)}
-              onChange={(e) => setDate(toISOFromMDY(e.target.value))}
+              className="input h-10 w-full max-w-[180px] tabular-nums"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
             />
           </div>
 

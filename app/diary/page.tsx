@@ -231,6 +231,65 @@ export default function Page() {
     return days;
   }, [entries]);
 
+  // Training load: rolling 7-day vs 28-day distance (last 28 days)
+  const rolling7and28Data = useMemo(() => {
+    const days = [...Array(28)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (27 - i));
+      const key = d.toISOString().slice(0, 10);
+      // rolling 7
+      let sum7 = 0;
+      for (let k = 0; k < 7; k++) {
+        const dd = new Date(d); dd.setDate(d.getDate() - k);
+        const kk = dd.toISOString().slice(0, 10);
+        const e = entries[kk];
+        sum7 += e ? toNum(e.workout?.run?.distanceKm) : 0;
+      }
+      // rolling 28
+      let sum28 = 0;
+      for (let k = 0; k < 28; k++) {
+        const dd = new Date(d); dd.setDate(d.getDate() - k);
+        const kk = dd.toISOString().slice(0, 10);
+        const e = entries[kk];
+        sum28 += e ? toNum(e.workout?.run?.distanceKm) : 0;
+      }
+      return { date: key.slice(5), r7: sum7, r28: sum28 };
+    });
+    return days;
+  }, [entries]);
+
+  // Weekly distance totals and % change (last 8 weeks, Monday-anchored)
+  const weeklyLoad = useMemo(() => {
+    const today = new Date();
+    const offsetToMonday = (today.getDay() + 6) % 7; // 0 if Monday
+    const mondayThisWeek = new Date(today);
+    mondayThisWeek.setDate(today.getDate() - offsetToMonday);
+
+    const weeks: { label: string; km: number; pct?: number; risk?: boolean }[] = [];
+    for (let w = 7; w >= 0; w--) {
+      const start = new Date(mondayThisWeek);
+      start.setDate(mondayThisWeek.getDate() - 7 * w);
+      const end = new Date(start); end.setDate(start.getDate() + 6);
+      let km = 0;
+      for (let d = 0; d < 7; d++) {
+        const dd = new Date(start); dd.setDate(start.getDate() + d);
+        const key = dd.toISOString().slice(0,10);
+        const e = entries[key];
+        km += e ? toNum(e.workout?.run?.distanceKm) : 0;
+      }
+      weeks.push({ label: `${start.toISOString().slice(5,10)}`, km });
+    }
+    // compute % change vs previous week for the last bar
+    for (let i = 1; i < weeks.length; i++) {
+      const prev = weeks[i-1].km;
+      const curr = weeks[i].km;
+      const pct = prev > 0 ? ((curr - prev) / prev) * 100 : undefined;
+      weeks[i].pct = pct;
+      weeks[i].risk = typeof pct === 'number' ? pct > 10 : false; // >10% increase flag
+    }
+    return weeks;
+  }, [entries]);
+
   // Macro composition (100% stacked by calories)
   const macrosPctData = useMemo(() => {
     const days = [...Array(14)].map((_, i) => {
@@ -257,6 +316,41 @@ export default function Page() {
       };
     });
     return days;
+  }, [entries]);
+
+  // Polarization by run counts over last 28 days (RPE buckets)
+  const polarizationByCount = useMemo(() => {
+    const today = new Date();
+    const from = new Date(today);
+    from.setDate(today.getDate() - 27); // inclusive window: 28 days
+
+    let easy = 0, moderate = 0, hard = 0, total = 0;
+
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(from);
+      d.setDate(from.getDate() + i);
+      const key = d.toISOString().slice(0, 10);
+      const e = entries[key];
+      if (!e) continue;
+
+      const runMin = e.workout?.run?.durationMin;
+      const runDist = e.workout?.run?.distanceKm;
+      const rpe = Number(e.workout?.run?.rpe || 0);
+      const hasRun = (toNum(runMin) > 0 || toNum(runDist) > 0);
+
+      if (hasRun && rpe > 0) {
+        total += 1;
+        if (rpe >= 9) hard += 1;
+        else if (rpe >= 7) moderate += 1;
+        else easy += 1; // 1–6
+      }
+    }
+
+    const easyPct = total ? (easy / total) * 100 : 0;
+    const data = [{ label: 'last 28d', easyPct, moderatePct: total ? (moderate / total) * 100 : 0, hardPct: total ? (hard / total) * 100 : 0 }];
+    const polarized = easyPct >= 80;
+
+    return { data, easy, moderate, hard, total, easyPct, polarized };
   }, [entries]);
 
   // Calendar weeks (Mon–Sun) for last 4 weeks, color-coded by nutrition/training
@@ -298,7 +392,7 @@ export default function Page() {
       r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg,'avg')} / ${fmt(r.hrMax,'max')}` : null,
       r.cadence || r.strideM ? `  Cadence/Stride: ${fmt(r.cadence,'spm')} · ${fmt(r.strideM,'m')}` : null,
       r.elevUp || r.elevDown ? `  Elevation: +${fmt(r.elevUp,'m')} / −${fmt(r.elevDown,'m')}` : null,
-      r.calories || r.sweatLossL ? `  Calories: ${fmt(r.calories,'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL,'L')}` : null,
+      r.calories || r.sweatLossL || r.rpe ? `  Calories: ${fmt(r.calories,'kcal')} · Est. sweat loss ~${fmt(r.sweatLossL,'L')} · RPE ${r.rpe || '—'}/10` : null,
       s.description || s.rounds ? `• Strength: ${s.description || '—'} ${s.rounds ? `(${s.rounds} rounds)` : ''}${s.weightLbs ? ` — ${s.weightLbs} lbs` : ''}${s.calories ? ` — ~${s.calories} kcal (est.)` : ''}` : null,
       '',
       'Nutrition',
@@ -539,6 +633,64 @@ export default function Page() {
                 <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" />
                 <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
                 <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" radius={[6,6,0,0]} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid-2">
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Polarization (last 28 days — by RPE count)</h3>
+          <div className="text-sm">
+            Easy ≤6: <span className="font-semibold">{Math.round(polarizationByCount.easyPct)}%</span>
+            {' '}({polarizationByCount.easy}/{polarizationByCount.total} runs)
+            <span className={
+              'ml-3 inline-block rounded-full px-2 py-0.5 text-xs ' +
+              (polarizationByCount.polarized ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')
+            }>
+              {polarizationByCount.polarized ? 'Polarized ✓' : 'Not polarized'}
+            </span>
+          </div>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={polarizationByCount.data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} />
+                <Tooltip formatter={(v, n) => [`${Math.round(Number(v))}%`, n as string]} />
+                <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#3b82f6" radius={[6,6,0,0]} />
+                <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#f59e0b" />
+                <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#ef4444" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Training Load — 7d vs 28d & weekly change</h3>
+          <div className="text-sm">
+            {(() => {
+              const last = weeklyLoad[weeklyLoad.length - 1];
+              const pct = last?.pct;
+              const risk = last?.risk;
+              return (
+                <span>
+                  This week vs last: {typeof pct === 'number' ? `${pct > 0 ? '+' : ''}${Math.round(pct)}%` : '—'}{' '}
+                  <span className={'ml-2 inline-block rounded-full px-2 py-0.5 text-xs ' + (risk ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700')}>
+                    {risk ? 'Risk >10%' : 'OK'}
+                  </span>
+                </span>
+              );
+            })()}
+          </div>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={rolling7and28Data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} />
+                <Tooltip formatter={(v, n) => [Math.round(Number(v)), n as string]} />
+                <Line type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#3b82f6" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="r28" name="Rolling 28d" stroke="#94a3b8" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

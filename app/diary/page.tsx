@@ -69,6 +69,65 @@ function rangeRPE(label: string, path: string, value: any, on: (p: string, v: an
   );
 }
 
+// ---------- TXT Template Download Helper ----------
+function buildTxtTemplate(dateISO: string) {
+  return [
+    '# PeakForm TXT Import Template',
+    '# Lines starting with # are ignored',
+    '',
+    `DATE=${dateISO}`,
+    '',
+    '# Workout: Run',
+    'DIST_KM=',
+    'DURATION_MIN=',
+    'PACE=',
+    'HR_AVG=',
+    'HR_MAX=',
+    'CADENCE=',
+    'STRIDE_M=',
+    'ELEV_UP=',
+    'ELEV_DOWN=',
+    'KCAL_RUN=',
+    'SWEAT_LOSS_L=',
+    'RPE=',
+    '',
+    '# Workout: Strength',
+    'STRENGTH_DESC=',
+    'STRENGTH_ROUNDS=',
+    'STRENGTH_WEIGHT_LBS=',
+    'STRENGTH_KCAL=',
+    '',
+    '# Nutrition',
+    'CALORIES=',
+    'CARBS_G=',
+    'PROTEIN_G=',
+    'FAT_G=',
+    'FIBRE_G=',
+    'CALORIE_TARGET=',
+    '',
+    '# Mindset',
+    'MOOD=',
+    'STRESS=',
+    'SLEEP_QUALITY=',
+    'NOTES=',
+    '',
+  ].join('\n');
+}
+
+function downloadTemplate() {
+  const today = todayISO();
+  const content = buildTxtTemplate(today);
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `peakform-template-${today}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // ---------- utils ----------
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const fmtNum = (v: number) => (Number.isFinite(v) ? new Intl.NumberFormat().format(v) : '—');
@@ -495,6 +554,14 @@ export default function Page() {
                   }}
                 />
               </label>
+              <button
+                type="button"
+                title="Download template"
+                className="btn h-10 w-10 inline-flex items-center justify-center bg-white shadow-sm"
+                onClick={downloadTemplate}
+              >
+                ↓
+              </button>
             </div>
           </div>
 

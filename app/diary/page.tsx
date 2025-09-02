@@ -443,7 +443,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 text-xs text-neutral-600 mt-4">
+          <div className="flex items-center gap-4 text-xs text-neutral-600 mt-5">
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
           </div>
@@ -456,8 +456,8 @@ export default function Page() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} />
-                <YAxis domain={[0, 'auto']} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} />
                 <Tooltip />
                 <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </ComposedChart>
@@ -470,8 +470,8 @@ export default function Page() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
-                <XAxis dataKey="date" tickMargin={6} />
-                <YAxis domain={[0, 'auto']} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
                 <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
                 <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
@@ -487,8 +487,8 @@ export default function Page() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={rolling7DistanceData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} />
-                <YAxis domain={[0, 'auto']} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'km']} />
                 <Bar dataKey="rolling7" name="Rolling 7-day" fill="#3b82f6" radius={[6,6,0,0]} barSize={18} />
               </ComposedChart>
@@ -501,8 +501,8 @@ export default function Page() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} />
-                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} />
                 <Tooltip
                   formatter={(value: any, name: any, { payload }: any) => {
                     const m = String(name).toLowerCase();

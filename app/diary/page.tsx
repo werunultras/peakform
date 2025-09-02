@@ -453,11 +453,11 @@ export default function Page() {
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Distance</h3>
-          <div className="h-56 flex items-center justify-center">
-            <ResponsiveContainer width="95%" height="90%">
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip />
                 <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </ComposedChart>
@@ -467,11 +467,11 @@ export default function Page() {
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Calories vs Target</h3>
-          <div className="h-56 flex items-center justify-center">
-            <ResponsiveContainer width="95%" height="90%">
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
                 <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
                 <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
@@ -484,11 +484,11 @@ export default function Page() {
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Rolling 7-day Distance</h3>
-          <div className="h-56 flex items-center justify-center">
-            <ResponsiveContainer width="95%" height="90%">
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={rolling7DistanceData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'km']} />
                 <Bar dataKey="rolling7" name="Rolling 7-day" fill="#3b82f6" radius={[6,6,0,0]} barSize={18} />
               </ComposedChart>
@@ -498,11 +498,11 @@ export default function Page() {
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
-          <div className="h-56 flex items-center justify-center">
-            <ResponsiveContainer width="95%" height="90%">
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
                 <Tooltip
                   formatter={(value: any, name: any, { payload }: any) => {
                     const m = String(name).toLowerCase();

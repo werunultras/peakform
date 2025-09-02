@@ -569,6 +569,7 @@ export default function Page() {
         </div>
       </div>
 
+      {/* Row 1: Distance + Rolling 7-day */}
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Distance</h3>
@@ -585,23 +586,6 @@ export default function Page() {
         </div>
 
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">14-day trend — Calories vs Target</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
-                <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
-                <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
-                <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid-2">
-        <div className="card space-y-2">
           <h3 className="text-lg font-medium">Rolling 7-day Distance</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -614,31 +598,9 @@ export default function Page() {
             </ResponsiveContainer>
           </div>
         </div>
-
-        <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
-                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
-                <Tooltip
-                  formatter={(value: any, name: any, { payload }: any) => {
-                    const m = String(name).toLowerCase();
-                    const grams = m.includes('carb') ? payload.carbsG : m.includes('protein') ? payload.proteinG : m.includes('fat') ? payload.fatG : null;
-                    return [`${Math.round(Number(value))}%${grams != null ? ` (${grams}g)` : ''}`, name];
-                  }}
-                  labelFormatter={(label) => `Date: ${label}`}
-                />
-                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" />
-                <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
-                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" radius={[6,6,0,0]} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       </div>
 
+      {/* Row 2: Polarization + Training Load */}
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Polarization (last 28 days — by RPE count)</h3>
@@ -652,11 +614,11 @@ export default function Page() {
               {polarizationByCount.polarized ? 'Polarized ✓' : 'Not polarized'}
             </span>
           </div>
-          <div className="h-40">
+          <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={polarizationByCount.data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} />
+                <XAxis dataKey="label" tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v, n) => [`${Math.round(Number(v))}%`, n as string]} />
                 <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#3b82f6" radius={[6,6,0,0]} />
                 <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#f59e0b" />
@@ -683,14 +645,55 @@ export default function Page() {
               );
             })()}
           </div>
-          <div className="h-40">
+          <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={rolling7and28Data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10 }} />
+                <XAxis dataKey="date" tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v, n) => [Math.round(Number(v)), n as string]} />
                 <Line type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#3b82f6" strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey="r28" name="Rolling 28d" stroke="#94a3b8" strokeWidth={2} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Calories vs Target + Macro Composition */}
+      <div className="grid-2">
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">14-day trend — Calories vs Target</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
+                <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
+                <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
+                <Bar dataKey="target"   name="Target"   fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
+                <Tooltip
+                  formatter={(value: any, name: any, { payload }: any) => {
+                    const m = String(name).toLowerCase();
+                    const grams = m.includes('carb') ? payload.carbsG : m.includes('protein') ? payload.proteinG : m.includes('fat') ? payload.fatG : null;
+                    return [`${Math.round(Number(value))}%${grams != null ? ` (${grams}g)` : ''}`, name];
+                  }}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" />
+                <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
+                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" radius={[6,6,0,0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

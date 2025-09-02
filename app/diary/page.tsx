@@ -32,10 +32,12 @@ function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
 }
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border p-3 bg-white">
+    <div className="rounded-xl border p-3 bg-white flex flex-col justify-between min-h-[96px]">
       <div className="text-xs text-neutral-600">{label}</div>
-      <div className="text-xl font-semibold tabular-nums">{value}</div>
-      {sub && <div className="text-xs text-neutral-500">{sub}</div>}
+      <div>
+        <div className="text-xl font-semibold tabular-nums">{value}</div>
+        {sub && <div className="text-xs text-neutral-500">{sub}</div>}
+      </div>
     </div>
   );
 }

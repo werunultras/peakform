@@ -401,9 +401,9 @@ export default function Page() {
           {/* Row 2: nutrition stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} />
+            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="Carbs 5–6g/kg" />
+            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="Protein 1.4–1.8g/kg" />
+            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="Fat 0.5–1g/kg" />
           </div>
           <div className="text-sm">
             Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}

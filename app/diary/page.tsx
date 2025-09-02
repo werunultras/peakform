@@ -443,7 +443,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 text-xs text-neutral-600 mt-8">
+          <div className="flex items-center gap-4 text-xs text-neutral-600 mt-16">
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
           </div>
@@ -453,8 +453,8 @@ export default function Page() {
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Distance</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-56 flex items-center justify-center">
+            <ResponsiveContainer width="95%" height="90%">
               <ComposedChart data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
@@ -467,8 +467,8 @@ export default function Page() {
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Calories vs Target</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-56 flex items-center justify-center">
+            <ResponsiveContainer width="95%" height="90%">
               <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
@@ -484,8 +484,8 @@ export default function Page() {
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Rolling 7-day Distance</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-56 flex items-center justify-center">
+            <ResponsiveContainer width="95%" height="90%">
               <ComposedChart data={rolling7DistanceData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
@@ -498,8 +498,8 @@ export default function Page() {
 
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-56 flex items-center justify-center">
+            <ResponsiveContainer width="95%" height="90%">
               <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12 }} />

@@ -230,6 +230,36 @@ export default function Page() {
     return days;
   }, [entries]);
 
+  // Calendar weeks (Mon–Sun) for last 6 weeks, color-coded by nutrition/training
+  const calendarWeeks = useMemo(() => {
+    const today = new Date();
+    const day = today.getDay(); // 0=Sun..6=Sat
+    const offsetToMonday = (day + 6) % 7; // 0 if Monday
+    const start = new Date(today);
+    // Start from Monday 5 weeks ago (6 weeks including current)
+    start.setDate(today.getDate() - offsetToMonday - 7 * 5);
+
+    const weeks: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[][] = [];
+    for (let w = 0; w < 6; w++) {
+      const days: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[] = [];
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(start);
+        dt.setDate(start.getDate() + w * 7 + d);
+        const iso = dt.toISOString().slice(0, 10);
+        const e = entries[iso];
+        const kcal = e ? toNum(e.nutrition?.calories) : 0;
+        const runDist = e ? toNum(e.workout?.run?.distanceKm) : 0;
+        const strengthRounds = e ? toNum(e.workout?.strength?.rounds) : 0;
+        let status: 'none' | 'nut' | 'train' = 'none';
+        if (kcal > 0 && (runDist > 0 || strengthRounds > 0)) status = 'train';
+        else if (kcal > 0) status = 'nut';
+        days.push({ iso, dayNum: dt.getDate(), status });
+      }
+      weeks.push(days);
+    }
+    return weeks;
+  }, [entries]);
+
   const endOfDayPrompt = useMemo(() => {
     const r = entry.workout.run; const s = entry.workout.strength; const n = entry.nutrition; const m = entry.mindset;
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
@@ -378,6 +408,40 @@ export default function Page() {
         </div>
       </div>
 
+      <div className="card space-y-3">
+        <h3 className="text-lg font-medium">Calendar — last 6 weeks</h3>
+        <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
+          <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+        </div>
+        <div className="space-y-2">
+          {calendarWeeks.map((week, wi) => (
+            <div key={wi} className="grid grid-cols-7 gap-2">
+              {week.map((day) => (
+                <div key={day.iso} className="flex items-center justify-center">
+                  <div
+                    className={
+                      'w-8 h-8 rounded-full border flex items-center justify-center ' +
+                      (day.status === 'train'
+                        ? 'bg-green-500 text-white border-green-500'
+                        : day.status === 'nut'
+                        ? 'bg-blue-500 text-white border-blue-500'
+                        : 'border-white/40')
+                    }
+                    title={day.iso}
+                  >
+                    <span className="text-[11px] leading-none">{day.dayNum}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-4 text-xs text-neutral-600">
+          <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
+          <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
+        </div>
+      </div>
+
       <div className="grid-2">
         <div className="card space-y-2">
           <h3 className="text-lg font-medium">14-day trend — Distance</h3>
@@ -439,9 +503,9 @@ export default function Page() {
                   }}
                   labelFormatter={(label) => `Date: ${label}`}
                 />
-                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" radius={[6,6,0,0]} />
+                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" />
                 <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
-                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" />
+                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" radius={[6,6,0,0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

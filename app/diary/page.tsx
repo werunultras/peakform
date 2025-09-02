@@ -230,17 +230,17 @@ export default function Page() {
     return days;
   }, [entries]);
 
-  // Calendar weeks (Mon–Sun) for last 6 weeks, color-coded by nutrition/training
+  // Calendar weeks (Mon–Sun) for last 4 weeks, color-coded by nutrition/training
   const calendarWeeks = useMemo(() => {
     const today = new Date();
     const day = today.getDay(); // 0=Sun..6=Sat
     const offsetToMonday = (day + 6) % 7; // 0 if Monday
     const start = new Date(today);
-    // Start from Monday 5 weeks ago (6 weeks including current)
-    start.setDate(today.getDate() - offsetToMonday - 7 * 5);
+    // Start from Monday 3 weeks ago (4 weeks including current)
+    start.setDate(today.getDate() - offsetToMonday - 7 * 3);
 
     const weeks: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[][] = [];
-    for (let w = 0; w < 6; w++) {
+    for (let w = 0; w < 4; w++) {
       const days: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[] = [];
       for (let d = 0; d < 7; d++) {
         const dt = new Date(start);

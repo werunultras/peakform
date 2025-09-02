@@ -471,7 +471,7 @@ export default function Page() {
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={caloriesVsTargetData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }} barCategoryGap="25%">
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
-                <YAxis domain={[1500, 'auto']} tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
                 <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
                 <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />

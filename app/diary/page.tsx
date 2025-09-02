@@ -32,12 +32,12 @@ function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
 }
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border p-3 bg-white flex flex-col justify-between min-h-[96px]">
+    <div className="rounded-xl border p-3 bg-white flex flex-col min-h-[96px]">
       <div className="text-xs text-neutral-600">{label}</div>
-      <div>
+      <div className="flex-1 flex items-center">
         <div className="text-xl font-semibold tabular-nums">{value}</div>
-        {sub && <div className="text-xs text-neutral-500">{sub}</div>}
       </div>
+      {sub && <div className="text-xs text-neutral-500">{sub}</div>}
     </div>
   );
 }
@@ -416,7 +416,7 @@ export default function Page() {
         </div>
 
         <div className="card space-y-3">
-          <h3 className="text-lg font-medium">Calendar — last 6 weeks</h3>
+          <h3 className="text-lg font-medium">Calendar</h3>
           <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
             <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
           </div>

@@ -443,7 +443,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <div className="pt-6 flex items-center justify-center gap-6 text-xs text-neutral-600">
+          <div className="pt-4 flex items-center justify-center gap-6 text-xs text-neutral-600">
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
           </div>

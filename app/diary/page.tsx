@@ -41,6 +41,33 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
     </div>
   );
 }
+function rpeColor(v: any) {
+  const n = Number(v);
+  if (n >= 9) return 'bg-red-500';
+  if (n >= 7) return 'bg-yellow-500';
+  return 'bg-blue-500'; // 1–6
+}
+
+function rangeRPE(label: string, path: string, value: any, on: (p: string, v: any) => void) {
+  const cls = rpeColor(value);
+  return (
+    <div>
+      <div className="flex items-center gap-2">
+        <div className="label m-0">{label}</div>
+        <span className={`inline-block w-2.5 h-2.5 rounded-full ${cls}`} aria-hidden />
+      </div>
+      <input
+        type="range"
+        min={1}
+        max={10}
+        step={1}
+        value={value || 1}
+        onChange={(e) => on(path, e.target.value)}
+        className="w-full"
+      />
+    </div>
+  );
+}
 
 // ---------- utils ----------
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -308,7 +335,7 @@ export default function Page() {
       map[k] = v;
     }
     const parsedDate = map['DATE'] || todayISO();
-    const run = { distanceKm: map['DIST_KM'], durationMin: map['DURATION_MIN'], pace: map['PACE'], hrAvg: map['HR_AVG'], hrMax: map['HR_MAX'], cadence: map['CADENCE'], strideM: map['STRIDE_M'], elevUp: map['ELEV_UP'], elevDown: map['ELEV_DOWN'], calories: map['KCAL_RUN'], sweatLossL: map['SWEAT_LOSS_L'] };
+    const run = { distanceKm: map['DIST_KM'], durationMin: map['DURATION_MIN'], pace: map['PACE'], hrAvg: map['HR_AVG'], hrMax: map['HR_MAX'], cadence: map['CADENCE'], strideM: map['STRIDE_M'], elevUp: map['ELEV_UP'], elevDown: map['ELEV_DOWN'], calories: map['KCAL_RUN'], sweatLossL: map['SWEAT_LOSS_L'], rpe: map['RPE'] };
     const strength = { description: map['STRENGTH_DESC'], rounds: map['STRENGTH_ROUNDS'], calories: map['STRENGTH_KCAL'], weightLbs: map['STRENGTH_WEIGHT_LBS'] };
     const nutrition = {calories: map['CALORIES'], carbsG: map['CARBS_G'], proteinG: map['PROTEIN_G'], fatG: map['FAT_G'], fibreG: map['FIBRE_G'], calorieTarget: map['CALORIE_TARGET'],};
     const mindset = { mood: map['MOOD'], stress: map['STRESS'], sleepQuality: map['SLEEP_QUALITY'], notes: map['NOTES'] };
@@ -534,6 +561,7 @@ export default function Page() {
           {num('Elev − (m)','workout.run.elevDown',entry.workout.run.elevDown,update)}
           {num('Calories (kcal)','workout.run.calories',entry.workout.run.calories,update)}
           {num('Sweat loss (L)','workout.run.sweatLossL',entry.workout.run.sweatLossL,update)}
+          {rangeRPE('RPE (1–10)','workout.run.rpe', entry.workout.run.rpe, update)}
         </div>
       </div>
 

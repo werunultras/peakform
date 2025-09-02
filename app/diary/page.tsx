@@ -401,9 +401,9 @@ export default function Page() {
           {/* Row 2: nutrition stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="Carbs 5–6g/kg" />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="Protein 1.4–1.8g/kg" />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="Fat 0.5–1g/kg" />
+            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="5–6g/kg" />
+            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="1.4–1.8g/kg" />
+            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="0.5–1g/kg" />
           </div>
           <div className="text-sm">
             Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
@@ -443,7 +443,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 text-xs text-neutral-600">
+          <div className="flex items-center gap-4 text-xs text-neutral-600 mt-4">
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
           </div>

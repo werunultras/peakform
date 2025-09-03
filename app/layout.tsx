@@ -1,42 +1,31 @@
 'use client';
-import { useEffect, useState } from 'react';
+import './globals.css';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import HeaderAuth from '@/components/HeaderAuth';
 
-export default function HeaderAuth() {
-  const [email, setEmail] = useState<string | null>(null);
-  const router = useRouter();
+export const metadata: Metadata = {
+  title: 'PeakForm',
+  description: 'High-performance training diary',
+};
 
-  useEffect(() => {
-    let mounted = true;
-    // Initial session check
-    supabase.auth.getUser().then(({ data }) => {
-      if (!mounted) return;
-      setEmail(data.user?.email ?? null);
-    });
-    // Keep header in sync with future logins/logouts
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setEmail(session?.user?.email ?? null);
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    // Optional: clean any body classes used by pages
-    document.body.classList.remove('hero-bg');
-    document.body.classList.remove('app-bg');
-    router.push('/');
-  }
-
-  if (!email) {
-    return <Link className="btn" href="/login">Login</Link>;
-  }
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <button className="btn" onClick={handleLogout}>Logout</button>
+    <html lang="en">
+      <body>
+        <div className="mx-auto max-w-5xl p-6">
+          <header className="mb-6 flex items-center justify-between">
+            <h1 className="text-2xl font-semibold tracking-tight">PeakForm</h1>
+            <nav className="flex items-center gap-3 text-sm">
+              <Link className="btn" href="/diary">Diary</Link>
+              {/* Swaps Login ↔ Logout dynamically */}
+              <HeaderAuth />
+            </nav>
+          </header>
+          {children}
+          <footer className="mt-8 text-xs text-neutral-500">Built on Next.js + Supabase. Sign in to use PeakForm.</footer>
+        </div>
+      </body>
+    </html>
   );
 }

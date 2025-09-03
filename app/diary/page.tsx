@@ -615,11 +615,16 @@ export default function Page() {
                       className={
                         'w-8 h-8 rounded-full border flex items-center justify-center ' +
                         (day.status === 'train'
-                          ? 'bg-green-500 text-white border-green-500'
+                          ? 'text-white' // styled inline below
                           : day.status === 'nut'
-                          ? 'bg-blue-500 text-white border-blue-500'
+                          ? 'text-white'
                           : 'border-white/40')
                       }
+                      style={day.status === 'train'
+                        ? { backgroundColor: '#fc4c02', borderColor: '#fc4c02' }
+                        : day.status === 'nut'
+                        ? { backgroundColor: '#ff955c', borderColor: '#ff955c' }
+                        : undefined}
                       title={day.iso}
                     >
                       <span className="text-[11px] leading-none">{day.dayNum}</span>
@@ -630,8 +635,8 @@ export default function Page() {
             ))}
           </div>
           <div className="pt-3 flex items-center justify-center gap-6 text-xs text-neutral-600">
-            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Nutrition only</span>
-            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>Nutrition + training</span>
+            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#ff955c' }}></span>Nutrition only</span>
+            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#fc4c02' }}></span>Nutrition + training</span>
           </div>
         </div>
       </div>
@@ -646,7 +651,7 @@ export default function Page() {
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip />
-                <Bar dataKey="distance" name="Distance" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="distance" name="Distance" fill="#fc4c02" radius={[6, 6, 0, 0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -660,7 +665,7 @@ export default function Page() {
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'km']} />
-                <Bar dataKey="rolling7" name="Rolling 7-day" fill="#3b82f6" radius={[6,6,0,0]} barSize={18} />
+                <Bar dataKey="rolling7" name="Rolling 7-day" fill="#fc4c02" radius={[6,6,0,0]} barSize={18} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -687,9 +692,9 @@ export default function Page() {
                 <XAxis dataKey="label" tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v, n) => [`${Math.round(Number(v))}%`, n as string]} />
-                <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#3b82f6" radius={[6,6,0,0]} />
-                <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#f59e0b" />
-                <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#ef4444" />
+                <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#ffd1bd" radius={[6,6,0,0]} />
+                <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#ff955c" />
+                <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#d63b00" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -718,8 +723,8 @@ export default function Page() {
                 <XAxis dataKey="date" tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v, n) => [Math.round(Number(v)), n as string]} />
-                <Line type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#3b82f6" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="r28" name="Rolling 28d" stroke="#94a3b8" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#fc4c02" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="r28" name="Rolling 28d" stroke="#ff955c" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -736,8 +741,8 @@ export default function Page() {
                 <XAxis dataKey="date" tickMargin={6} tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v) => [Math.round(Number(v)), 'kcal']} />
-                <Bar dataKey="calories" name="Calories" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={18} />
-                <Bar dataKey="target"   name="Target"   fill="#94a3b8" radius={[6, 6, 0, 0]} barSize={18} />
+                <Bar dataKey="calories" name="Calories" fill="#fc4c02" radius={[6, 6, 0, 0]} barSize={18} />
+                <Bar dataKey="target"   name="Target"   fill="#ffd1bd" radius={[6, 6, 0, 0]} barSize={18} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -758,9 +763,9 @@ export default function Page() {
                   }}
                   labelFormatter={(label) => `Date: ${label}`}
                 />
-                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#38bdf8" />
-                <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#22c55e" />
-                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#f59e0b" radius={[6,6,0,0]} />
+                <Bar stackId="macros" dataKey="carbsPct"   name="Carbs"   fill="#fc4c02" />
+                <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#ff955c" />
+                <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#d63b00" radius={[6,6,0,0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

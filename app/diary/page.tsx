@@ -26,7 +26,7 @@ function range(l: string, p: string, v: any, on: (p: string, v: any) => void) {
   return (
     <div className="select-none">
       {label(`${l} ${(v || '—') as string}/5`)}
-      <input type="range" min={1} max={5} step={1} value={v || 3} onChange={(e) => on(p, e.target.value)} className="w-full" />
+      <input type="range" min={1} max={5} step={1} value={v || 3} onChange={(e) => on(p, e.target.value)} className="w-full range-orange" />
     </div>
   );
 }
@@ -63,7 +63,7 @@ function rangeRPE(label: string, path: string, value: any, on: (p: string, v: an
         step={1}
         value={value || 1}
         onChange={(e) => on(path, e.target.value)}
-        className="w-full"
+        className="w-full range-orange"
       />
     </div>
   );

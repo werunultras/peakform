@@ -66,3 +66,5 @@ body.hero-bg header .btn {
 body.hero-bg header .btn:hover {
   background: rgba(255,255,255,.10);
 }
+/* Brand color for range sliders */
+input[type="range"].range-orange { accent-color: #fc4c02; }

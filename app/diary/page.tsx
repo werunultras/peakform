@@ -377,39 +377,52 @@ export default function Page() {
     return days;
   }, [entries]);
 
-  // Polarization by run counts over last 28 days (RPE buckets)
-  const polarizationByCount = useMemo(() => {
+  // Polarization by run counts — weekly 100% stacked over last 8 weeks (Mon-anchored)
+  const polarizationWeekly = useMemo(() => {
+    const weeks: {
+      weekLabel: string;
+      easyPct: number; moderatePct: number; hardPct: number;
+      easy: number; moderate: number; hard: number; total: number;
+    }[] = [];
+
     const today = new Date();
-    const from = new Date(today);
-    from.setDate(today.getDate() - 27); // inclusive window: 28 days
+    const offsetToMonday = (today.getDay() + 6) % 7; // 0 if Monday
+    const mondayThisWeek = new Date(today);
+    mondayThisWeek.setDate(today.getDate() - offsetToMonday);
 
-    let easy = 0, moderate = 0, hard = 0, total = 0;
+    // build 8 weeks, oldest -> newest
+    for (let w = 7; w >= 0; w--) {
+      const start = new Date(mondayThisWeek);
+      start.setDate(mondayThisWeek.getDate() - 7 * w);
+      const end = new Date(start); end.setDate(start.getDate() + 6);
 
-    for (let i = 0; i < 28; i++) {
-      const d = new Date(from);
-      d.setDate(from.getDate() + i);
-      const key = d.toISOString().slice(0, 10);
-      const e = entries[key];
-      if (!e) continue;
+      let easy = 0, moderate = 0, hard = 0, total = 0;
 
-      const runMin = e.workout?.run?.durationMin;
-      const runDist = e.workout?.run?.distanceKm;
-      const rpe = Number(e.workout?.run?.rpe || 0);
-      const hasRun = (toNum(runMin) > 0 || toNum(runDist) > 0);
-
-      if (hasRun && rpe > 0) {
-        total += 1;
-        if (rpe >= 9) hard += 1;
-        else if (rpe >= 7) moderate += 1;
-        else easy += 1; // 1–6
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(start); dt.setDate(start.getDate() + d);
+        const key = dt.toISOString().slice(0,10);
+        const e = entries[key];
+        if (!e) continue;
+        const runMin = e.workout?.run?.durationMin;
+        const runDist = e.workout?.run?.distanceKm;
+        const rpe = Number(e.workout?.run?.rpe || 0);
+        const hasRun = (toNum(runMin) > 0 || toNum(runDist) > 0);
+        if (hasRun && rpe > 0) {
+          total += 1;
+          if (rpe >= 9) hard += 1;
+          else if (rpe >= 7) moderate += 1;
+          else easy += 1;
+        }
       }
+
+      const easyPct = total ? (easy / total) * 100 : 0;
+      const moderatePct = total ? (moderate / total) * 100 : 0;
+      const hardPct = total ? (hard / total) * 100 : 0;
+      const label = `${start.toISOString().slice(5,10)}`; // MM-DD of week start
+      weeks.push({ weekLabel: label, easyPct, moderatePct, hardPct, easy, moderate, hard, total });
     }
 
-    const easyPct = total ? (easy / total) * 100 : 0;
-    const data = [{ label: 'last 28d', easyPct, moderatePct: total ? (moderate / total) * 100 : 0, hardPct: total ? (hard / total) * 100 : 0 }];
-    const polarized = easyPct >= 80;
-
-    return { data, easy, moderate, hard, total, easyPct, polarized };
+    return weeks;
   }, [entries]);
 
   // Calendar weeks (Mon–Sun) for last 4 weeks, color-coded by nutrition/training
@@ -675,23 +688,31 @@ export default function Page() {
       {/* Row 2: Polarization + Training Load */}
       <div className="grid-2">
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Polarization (last 28 days — by RPE count)</h3>
+          <h3 className="text-lg font-medium">Polarization (8 weeks — by RPE count)</h3>
           <div className="text-sm">
-            Easy ≤6: <span className="font-semibold">{Math.round(polarizationByCount.easyPct)}%</span>
-            {' '}({polarizationByCount.easy}/{polarizationByCount.total} runs)
-            <span className={
-              'ml-3 inline-block rounded-full px-2 py-0.5 text-xs ' +
-              (polarizationByCount.polarized ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')
-            }>
-              {polarizationByCount.polarized ? 'Polarized ✓' : 'Not polarized'}
-            </span>
+            {(() => {
+              const last = polarizationWeekly[polarizationWeekly.length - 1];
+              const easyPct = last ? Math.round(last.easyPct) : 0;
+              const runsInfo = last ? `(${last.easy}/${last.total} runs)` : '';
+              const ok = easyPct >= 80;
+              return (
+                <span>
+                  Last week Easy ≤6: <span className="font-semibold">{easyPct}%</span> {runsInfo}
+                  <span className={'ml-3 inline-block rounded-full px-2 py-0.5 text-xs ' + (ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}>
+                    {ok ? 'Polarized ✓' : 'Not polarized'}
+                  </span>
+                </span>
+              );
+            })()}
           </div>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={polarizationByCount.data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-                <XAxis dataKey="label" tick={{ fontSize: 14 }} />
+              <ComposedChart data={polarizationWeekly} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="weekLabel" tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 14 }} />
-                <Tooltip formatter={(v, n) => [`${Math.round(Number(v))}%`, n as string]} />
+                <Tooltip formatter={(v, n, { payload }) => {
+                  return [`${Math.round(Number(v))}%`, n as string];
+                }} />
                 <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#ffd1bd" radius={[6,6,0,0]} />
                 <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#ff955c" />
                 <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#d63b00" />

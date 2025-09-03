@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -740,13 +740,14 @@ export default function Page() {
           </div>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={rolling7and28Data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+              <AreaChart data={rolling7and28Data} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
                 <XAxis dataKey="date" tick={{ fontSize: 14 }} />
                 <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
                 <Tooltip formatter={(v, n) => [Math.round(Number(v)), n as string]} />
-                <Line type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#fc4c02" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="r28" name="Rolling 28d" stroke="#ff955c" strokeWidth={2} dot={false} />
-              </ComposedChart>
+                {/* Put chronic (28d) underneath so acute sits on top */}
+                <Area type="monotone" dataKey="r28" name="Rolling 28d" stroke="#ff955c" fill="#ff955c" fillOpacity={0.25} strokeWidth={2} />
+                <Area type="monotone" dataKey="r7"  name="Rolling 7d"  stroke="#fc4c02" fill="#fc4c02" fillOpacity={0.35} strokeWidth={2} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>

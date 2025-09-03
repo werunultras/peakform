@@ -628,15 +628,15 @@ export default function Page() {
                       className={
                         'w-8 h-8 rounded-full border flex items-center justify-center ' +
                         (day.status === 'train'
-                          ? 'text-white' // styled inline below
+                          ? 'text-white border-black'
                           : day.status === 'nut'
-                          ? 'text-white'
-                          : 'border-white/40')
+                          ? 'text-white border-black'
+                          : 'border-black')
                       }
                       style={day.status === 'train'
-                        ? { backgroundColor: '#fc4c02', borderColor: '#fc4c02' }
+                        ? { backgroundColor: '#fc4c02', borderColor: '#000' }
                         : day.status === 'nut'
-                        ? { backgroundColor: '#ff955c', borderColor: '#ff955c' }
+                        ? { backgroundColor: '#ff955c', borderColor: '#000' }
                         : undefined}
                       title={day.iso}
                     >

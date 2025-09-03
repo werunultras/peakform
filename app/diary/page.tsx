@@ -377,7 +377,7 @@ export default function Page() {
     return days;
   }, [entries]);
 
-  // Polarization by run counts — weekly 100% stacked over last 8 weeks (Mon-anchored)
+  // Polarization by run counts — weekly 100% stacked over last 10 weeks (Mon-anchored)
   const polarizationWeekly = useMemo(() => {
     const weeks: {
       weekLabel: string;
@@ -390,8 +390,8 @@ export default function Page() {
     const mondayThisWeek = new Date(today);
     mondayThisWeek.setDate(today.getDate() - offsetToMonday);
 
-    // build 8 weeks, oldest -> newest
-    for (let w = 7; w >= 0; w--) {
+    // build 10 weeks, oldest -> newest
+    for (let w = 9; w >= 0; w--) {
       const start = new Date(mondayThisWeek);
       start.setDate(mondayThisWeek.getDate() - 7 * w);
       const end = new Date(start); end.setDate(start.getDate() + 6);
@@ -688,7 +688,7 @@ export default function Page() {
       {/* Row 2: Polarization + Training Load */}
       <div className="grid-2">
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Polarization (8 weeks — by RPE count)</h3>
+          <h3 className="text-lg font-medium">Polarization (10 weeks — by RPE count)</h3>
           <div className="text-sm">
             {(() => {
               const last = polarizationWeekly[polarizationWeekly.length - 1];
@@ -713,9 +713,9 @@ export default function Page() {
                 <Tooltip formatter={(v, n, { payload }) => {
                   return [`${Math.round(Number(v))}%`, n as string];
                 }} />
-                <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#ffd1bd" radius={[6,6,0,0]} />
+                <Bar stackId="rpe" dataKey="easyPct"     name="Easy (1–6)"  fill="#ffd1bd" />
                 <Bar stackId="rpe" dataKey="moderatePct" name="Mod (7–8)"   fill="#ff955c" />
-                <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#d63b00" />
+                <Bar stackId="rpe" dataKey="hardPct"     name="Hard (9–10)" fill="#d63b00" radius={[6,6,0,0]} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

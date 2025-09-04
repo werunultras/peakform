@@ -6,13 +6,8 @@ import HeaderAuth from '@/components/HeaderAuth';
 export const metadata: Metadata = {
   title: 'PeakForm',
   description: 'High-performance training diary',
-};
-
-export const metadata: Metadata = {
-  title: 'PeakForm',
-  description: 'High-performance training diary',
   icons: {
-    icon: '/public/favicon.ico', // or /favicon.png if you keep it as PNG
+    icon: '/favicon.ico', // or /favicon.png if you keep it as PNG
   },
 };
 

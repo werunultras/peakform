@@ -31,6 +31,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Privacy Policy
               </Link>
             </div>
+            <div>
+              <Link href="/terms" className="underline hover:text-neutral-700">
+                Terms of Service
+              </Link>
+            </div>
           </footer>
         </div>
       </body>

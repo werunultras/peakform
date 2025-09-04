@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -92,6 +92,20 @@ function hhmm(l: string, p: string, v: any, on: (p: string, v: any) => void) {
       />
     </div>
   );
+}
+// Convert hh:mm (string or number) to decimal hours
+function hhmmToHours(v: any): number {
+  if (v == null) return 0;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+  const s = String(v).trim();
+  const m = s.match(/^(\d{1,2}):(\d{1,2})$/);
+  if (m) {
+    const hh = Math.max(0, Math.min(23, parseInt(m[1], 10)));
+    const mm = Math.max(0, Math.min(59, parseInt(m[2], 10)));
+    return hh + mm / 60;
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
 }
 // ---------- TXT Template Download Helper ----------
 function buildTxtTemplate(dateISO: string) {
@@ -400,6 +414,44 @@ export default function Page() {
       };
     });
     return days;
+  }, [entries]);
+
+  // Sleep: rolling 7-day average & balance (banking/debt) over last 28 days
+  const sleepRollAndBalance = useMemo(() => {
+    const target = 7.5; // hours
+    const out: { date: string; roll7: number; balance: number }[] = [];
+    let balance = 0;
+    for (let i = 0; i < 28; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - (27 - i));
+      const iso = d.toISOString().slice(0, 10);
+      // hours for this day
+      const e = entries[iso];
+      const hrs = e ? hhmmToHours(e.mindset?.sleepHrs) : 0;
+
+      // 7-day average including today
+      let sum = 0, cnt = 0;
+      for (let k = 0; k < 7; k++) {
+        const dd = new Date(d);
+        dd.setDate(d.getDate() - k);
+        const key = dd.toISOString().slice(0, 10);
+        const ee = entries[key];
+        const hv = ee ? hhmmToHours(ee.mindset?.sleepHrs) : 0;
+        if (hv > 0) { sum += hv; cnt++; }
+      }
+      const roll7 = cnt ? sum / cnt : 0;
+
+      // balance update (banking decays fast, debt decays slower)
+      const delta = hrs - target;
+      if (delta >= 0) {
+        balance = balance * 0.6 + Math.min(delta, 1.5);
+      } else {
+        balance = balance * 0.9 + delta;
+      }
+
+      out.push({ date: iso.slice(5), roll7, balance });
+    }
+    return out;
   }, [entries]);
 
   // Polarization by run counts — weekly 100% stacked over last 10 weeks (Mon-anchored)
@@ -814,6 +866,40 @@ export default function Page() {
                 <Bar stackId="macros" dataKey="proteinPct" name="Protein" fill="#ff955c" />
                 <Bar stackId="macros" dataKey="fatPct"     name="Fat"     fill="#d63b00" radius={[6,6,0,0]} />
               </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 4: Sleep — Rolling avg and Balance */}
+      <div className="grid-2">
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Rolling 7-day Sleep — avg vs target band</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={sleepRollAndBalance} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 14 }} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 14 }} />
+                <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(2) : v, 'h']} />
+                {/* Target band 7.0–8.0 h */}
+                <ReferenceArea y1={7} y2={8} fill="#94a3b8" fillOpacity={0.15} />
+                <Area type="monotone" dataKey="roll7" name="7d avg" stroke="#fc4c02" fill="#fc4c02" fillOpacity={0.3} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Sleep Balance (banking/debt)</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={sleepRollAndBalance} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 14 }} />
+                <YAxis domain={[ 'auto', 'auto' ]} tick={{ fontSize: 14 }} />
+                <Tooltip formatter={(v) => [ (Number(v) >= 0 ? '+' : '') + Number(v).toFixed(2), 'h' ]} />
+                <ReferenceLine y={0} stroke="#111" strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="balance" name="Balance (h)" stroke="#fc4c02" fill="#fc4c02" fillOpacity={0.3} strokeWidth={2} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>

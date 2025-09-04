@@ -68,3 +68,12 @@ body.hero-bg header .btn:hover {
 }
 /* Brand color for range sliders */
 input[type="range"].range-orange { accent-color: #fc4c02; }
+
+/* Footer styling */
+footer {
+  @apply mt-12 py-6 text-center text-sm text-neutral-500;
+}
+
+footer a {
+  @apply underline hover:text-neutral-700;
+}

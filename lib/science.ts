@@ -28,14 +28,5 @@ export const findings: Finding[] = [
     date: '2025-08-15',
     tags: ['sleep','recovery']
   },
-  {
-    id: 'polarized-training-2022',
-    title: 'Polarized distribution beats threshold heavy',
-    summary: 'Higher % of easy sessions with a few hard bouts improved 10k time more than threshold-heavy plans in amateurs.',
-    sourceTitle: 'Martín et al., Int J Sports Physiol Perform (2022)',
-    sourceLink: 'https://doi.org/10.zzzz/zzzzz',
-    date: '2025-07-20',
-    tags: ['endurance','programming','polarization']
-  },
   // add more items here…
 ];

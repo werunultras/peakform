@@ -11,31 +11,13 @@ export type Finding = {
 
 export const findings: Finding[] = [
   {
-    id: 'caffeine-sprints-2024',
-    title: 'Caffeine improves repeated sprint power',
-    summary: '3 mg·kg⁻¹ caffeine increased mean repeated-sprint power by ~3–4% in trained cyclists (dbl-blind crossover).',
-    sourceTitle: 'Smith et al., Med Sci Sports Exerc (2024)',
-    sourceLink: 'https://doi.org/10.xxxx/xxxxx',
-    date: '2025-09-01',
-    tags: ['endurance','nutrition','ergogenic']
-  },
-  {
-    id: 'sleep-extension-2023',
-    title: 'Short sleep impairs endurance performance',
-    summary: '≤6 h/night for several days reduced time to exhaustion; partial recovery after 2–3 nights ≥8 h (sleep extension).',
-    sourceTitle: 'Jones et al., Eur J Appl Physiol (2023)',
-    sourceLink: 'https://doi.org/10.yyyy/yyyyy',
-    date: '2025-08-15',
-    tags: ['sleep','recovery']
-  },
-  {
-    id: 'polarized-training-2022',
-    title: 'Polarized distribution beats threshold heavy',
-    summary: 'Higher % of easy sessions with a few hard bouts improved 10k time more than threshold-heavy plans in amateurs.',
-    sourceTitle: 'Martín et al., Int J Sports Physiol Perform (2022)',
-    sourceLink: 'https://doi.org/10.zzzz/zzzzz',
-    date: '2025-07-20',
-    tags: ['endurance','programming','polarization']
+    id: 'altini-crf-wearables-2016'
+    title: 'Wearable heart-rate data predict fitness without lab tests'
+    summary: 'In 51 adults, submaximal HR during daily activities detected by wearables predicted VO₂max with ~21% lower error than anthropometrics alone (lab + free-living, cross-validated).'
+    sourceTitle: 'Altini et al., J Appl Physiol (2016)'
+    sourceLink: 'https://doi.org/10.1152/japplphysiol.00519.2015'
+    date: '2016-03-03'
+    tags: ['wearables','cardiorespiratory']
   },
   // add more items here…
 ];

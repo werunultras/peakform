@@ -19,8 +19,6 @@ export default function SciencePage() {
     <HeroBg>
       <div className="p-8">
         <div className="max-w-6xl mx-auto space-y-6">
-          <h1 className="text-white text-2xl font-semibold">Science</h1>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {show.map(item => (
               <ScienceCard key={item.id} f={item} />

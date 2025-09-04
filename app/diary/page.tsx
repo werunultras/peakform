@@ -848,7 +848,7 @@ export default function Page() {
         </div>
 
         <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Macro Composition (100%)</h3>
+          <h3 className="text-lg font-medium">Macro Composition</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={macrosPctData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>

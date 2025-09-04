@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'PeakForm',
   description: 'High-performance training diary',
   icons: {
-    icon: '/favicon.ico', // or /favicon.png if you keep it as PNG
+    icon: '/public/favicon.ico', // or /favicon.png if you keep it as PNG
   },
 };
 

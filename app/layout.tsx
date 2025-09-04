@@ -26,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <footer className="mt-8 text-xs text-white text-center space-y-1">
             <div>Built on Next.js + Supabase. Sign in to use PeakForm.</div>
+            <div>Photo by Matteo Catanese on Unsplash</div>
             <div>
               <Link href="/privacy" className="underline hover:text-gray-300">
                 Privacy Policy

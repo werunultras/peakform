@@ -18,6 +18,6 @@ export const findings: Finding[] = [
     sourceLink: 'https://doi.org/10.1152/japplphysiol.00519.2015'
     date: '2016-03-03'
     tags: ['wearables','cardiorespiratory']
-  }
+  },
   // add more items here…
 ];

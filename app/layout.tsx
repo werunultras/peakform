@@ -18,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/">PeakForm</Link>
             </h1>
             <nav className="flex items-center gap-3 text-sm">
+              <Link className="btn" href="/science">Science</Link>
               <Link className="btn" href="/diary">Diary</Link>
               {/* Swaps Login ↔ Logout dynamically */}
               <HeaderAuth />

@@ -24,15 +24,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </header>
           {children}
-          <footer className="mt-8 text-xs text-neutral-500 text-center space-y-1">
+          <footer className="mt-8 text-xs text-white text-center space-y-1">
             <div>Built on Next.js + Supabase. Sign in to use PeakForm.</div>
             <div>
-              <Link href="/privacy" className="underline hover:text-neutral-700">
+              <Link href="/privacy" className="underline hover:text-gray-300">
                 Privacy Policy
               </Link>
             </div>
             <div>
-              <Link href="/terms" className="underline hover:text-neutral-700">
+              <Link href="/terms" className="underline hover:text-gray-300">
                 Terms of Service
               </Link>
             </div>

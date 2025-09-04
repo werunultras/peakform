@@ -19,5 +19,4 @@ export const findings: Finding[] = [
     date: '2016-03-03'
     tags: ['wearables','cardiorespiratory']
   },
-  // add more items here…
 ];

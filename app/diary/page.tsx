@@ -458,6 +458,81 @@ export default function Page() {
     return out;
   }, [entries]);
 
+// helper: HRV numeric
+function toNumHRV(v: any) {
+  const n = Number(String(v ?? '').replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
+// HRV daily bars + 42-day rolling corridor (mean ± 1 SD, prior days only)
+const hrvCorridorData = useMemo(() => {
+  // Build 60 days so the 42-day corridor has enough history
+  const days = [...Array(60)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (59 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const e = entries[iso];
+    const hrv = e ? toNumHRV(e.mindset?.hrv) : 0;
+
+    // prior 42-day window, exclude today
+    const vals: number[] = [];
+    for (let k = 1; k <= 42; k++) {
+      const dd = new Date(d);
+      dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0, 10);
+      const ee = entries[key];
+      const hv = ee ? toNumHRV(ee.mindset?.hrv) : 0;
+      if (hv > 0) vals.push(hv);
+    }
+
+    let baseLow: number | null = null;
+    let band = 0;
+    if (vals.length >= 10) {
+      const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const sd = Math.sqrt(vals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / vals.length);
+      baseLow = mean - sd;
+      const baseHigh = mean + sd;
+      band = Math.max(0, baseHigh - baseLow);
+    }
+
+    return { date: iso.slice(5), hrv, baseLow, band };
+  });
+  return days;
+}, [entries]);
+
+// RHR daily bars + 14-day rolling corridor (mean ± 5 bpm), prior days only
+const rhrCorridorData = useMemo(() => {
+  const days = [...Array(42)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (41 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const e = entries[iso];
+    const rhr = e ? toNum(e.mindset?.rhr) : 0;
+
+    // prior 14-day window, exclude today
+    const vals: number[] = [];
+    for (let k = 1; k <= 14; k++) {
+      const dd = new Date(d);
+      dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0, 10);
+      const ee = entries[key];
+      const rv = ee ? toNum(ee.mindset?.rhr) : 0;
+      if (rv > 0) vals.push(rv);
+    }
+
+    let baseLow: number | null = null;
+    let band = 0;
+    if (vals.length >= 5) {
+      const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+      baseLow = mean - 5; // within 5 bpm corridor
+      band = 10;          // fixed width (±5 bpm)
+    }
+
+    return { date: iso.slice(5), rhr, baseLow, band };
+  });
+  return days;
+}, [entries]);
+
   // Polarization by run counts — weekly 100% stacked over last 10 weeks (Mon-anchored)
   const polarizationWeekly = useMemo(() => {
     const weeks: {
@@ -919,6 +994,70 @@ export default function Page() {
           </div>
         </div>
       </div>
+      
+      {/* Row 5: HRV & RHR Corridors */}
+<div className="grid-2">
+  {/* HRV corridor */}
+  <div className="card space-y-2">
+    <h3 className="text-lg font-medium">HRV — daily vs 42-day baseline</h3>
+    <div className="h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={hrvCorridorData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
+          <YAxis domain={['auto', 'auto']} tick={{ fontSize: 12 }} />
+          <Tooltip
+            formatter={(v: any, n: any, { payload }: any) => {
+              if (n === 'HRV') return [`${Math.round(Number(v))} ms`, 'HRV'];
+              if (n === 'Band') {
+                const low = payload.baseLow;
+                const high = low != null ? low + payload.band : null;
+                return high != null ? [`${Math.round(low)}–${Math.round(high)} ms`, 'Baseline'] : ['—', 'Baseline'];
+              }
+              return [v, n];
+            }}
+            labelFormatter={(label) => `Date: ${label}`}
+          />
+          {/* Corridor band: transparent baseLow + band height to fill area */}
+          <Area type="monotone" dataKey="baseLow" stackId="band" stroke="none" fill="transparent" isAnimationActive={false} />
+          <Area type="monotone" dataKey="band"    stackId="band" stroke="none" fill="#fc4c02" fillOpacity={0.15} isAnimationActive={false} name="Band" />
+          {/* Daily HRV bars on top */}
+          <Bar dataKey="hrv" name="HRV" fill="#fc4c02" radius={[4,4,0,0]} barSize={10} />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+
+  {/* RHR corridor */}
+  <div className="card space-y-2">
+    <h3 className="text-lg font-medium">RHR — daily vs 14-day baseline (±5 bpm)</h3>
+    <div className="h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={rhrCorridorData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
+          <YAxis domain={['auto', 'auto']} tick={{ fontSize: 12 }} />
+          <Tooltip
+            formatter={(v: any, n: any, { payload }: any) => {
+              if (n === 'RHR') return [`${Math.round(Number(v))} bpm`, 'RHR'];
+              if (n === 'Band') {
+                const low = payload.baseLow;
+                const high = low != null ? low + payload.band : null;
+                return high != null ? [`${Math.round(low)}–${Math.round(high)} bpm`, 'Baseline'] : ['—', 'Baseline'];
+              }
+              return [v, n];
+            }}
+            labelFormatter={(label) => `Date: ${label}`}
+          />
+          {/* Corridor band */}
+          <Area type="monotone" dataKey="baseLow" stackId="band" stroke="none" fill="transparent" isAnimationActive={false} />
+          <Area type="monotone" dataKey="band"    stackId="band" stroke="none" fill="#fc4c02" fillOpacity={0.15} isAnimationActive={false} name="Band" />
+          {/* Daily RHR bars */}
+          <Bar dataKey="rhr" name="RHR" fill="#fc4c02" radius={[4,4,0,0]} barSize={10} />
+        </ComposedChart>
+      </ResponsiveContainer>
+      </div>
+    </div>
+  </div>              
+
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Run</h3>

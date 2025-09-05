@@ -616,7 +616,7 @@ const rhrCorridorData = useMemo(() => {
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
     const lines = [
       "Write a reflective, first-person daily fitness journal entry based on the following structured data. Focus on tone over metrics — translate the numbers into meaningful insight. Highlight training load and perceived effort, progress vs goals (e.g., calorie or macro intake), and recovery signals (e.g., HRV, sleep, mood). Use natural, fluent language, avoid bullet points, and don't repeat all metrics verbatim — synthesise instead. Mention anything noteworthy, such as strong runs, under-fuelling, or positive mindset shifts. Keep it concise, no more than one paragraph.",
-      '', //
+      '', ////
       'Training — Today',
       r.distanceKm || r.durationMin || r.pace ? `• Run: ${fmt(r.distanceKm,'km')} · ${fmt(r.durationMin,'min')} · ${fmt(r.pace,'pace')}` : null,
       r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg,'avg')} / ${fmt(r.hrMax,'max')}` : null,
@@ -756,33 +756,32 @@ const rhrCorridorData = useMemo(() => {
       </div>
 
 
-      <div className="grid-2">
-        <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Today — Summary</h3>
-          {/* Row 1: training stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-            <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
-            <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
-            <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
-          </div>
-          {/* Row 2: nutrition stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
-            <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="5–6g/kg" />
-            <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="1.4–1.8g/kg" />
-            <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="0.5–1g/kg" />
-          </div>
-          <div className="text-sm">
-            Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
-            {totals.deficit > 0
-              ? `(${fmtNum(totals.deficit)} kcal below target)`
-              : totals.deficit < 0
-              ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
-              : '(on target)'}
-          </div>
+      {/* Today — Summary (full-width) */}
+      <div className="card space-y-2">
+        <h3 className="text-lg font-medium">Today — Summary</h3>
+        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 text-sm">
+          {/* 8 items in one row */}
+          <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+          <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+          <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
+          <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
+          <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
+          <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="5–6g/kg" />
+          <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="1.4–1.8g/kg" />
+          <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="0.5–1g/kg" />
         </div>
+        <div className="text-sm">
+          Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
+          {totals.deficit > 0
+            ? `(${fmtNum(totals.deficit)} kcal below target)`
+            : totals.deficit < 0
+            ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
+            : '(on target)'}
+        </div>
+      </div>
 
+      {/* Calendar (left) + Journal (right) */}
+      <div className="grid-2">
         <div className="card space-y-3">
           <h3 className="text-lg font-medium">Calendar</h3>
           <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
@@ -820,6 +819,16 @@ const rhrCorridorData = useMemo(() => {
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#ff955c' }}></span>Nutrition only</span>
             <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#fc4c02' }}></span>Nutrition + training</span>
           </div>
+        </div>
+
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Journal</h3>
+          <textarea
+            className="input h-56"
+            value={(entry.mindset as any).journal || ''}
+            onChange={(e) => update('mindset.journal', e.target.value)}
+            placeholder="Write a holistic wrap‑up of your day: how you felt, what stood out, lessons for tomorrow…"
+          />
         </div>
       </div>
 
@@ -1130,23 +1139,11 @@ const rhrCorridorData = useMemo(() => {
         </div>
       </div>
 
-      <div className="grid-2">
-        <div className="card space-y-2">
-          <h3 className="text-lg font-medium">End-of-day prompt</h3>
-          <textarea className="input h-40" readOnly value={endOfDayPrompt} />
-          <div className="flex justify-end">
-            <button className="btn" onClick={copyPrompt}>Copy</button>
-          </div>
-        </div>
-
-        <div className="card space-y-2">
-          <h3 className="text-lg font-medium">Journal</h3>
-          <textarea
-            className="input h-40"
-            value={(entry.mindset as any).journal || ''}
-            onChange={(e) => update('mindset.journal', e.target.value)}
-            placeholder="Write a holistic wrap‑up of your day: how you felt, what stood out, lessons for tomorrow…"
-          />
+      <div className="card space-y-2">
+        <h3 className="text-lg font-medium">End-of-day prompt</h3>
+        <textarea className="input h-40" readOnly value={endOfDayPrompt} />
+        <div className="flex justify-end">
+          <button className="btn" onClick={copyPrompt}>Copy</button>
         </div>
       </div>
     </div>

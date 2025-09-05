@@ -143,11 +143,15 @@ function buildTxtTemplate(dateISO: string) {
     'FIBRE_G=',
     'CALORIE_TARGET=',
     '',
+    '# Recovery',
+    'SLEEP_HRS=',
+    'RHR=',
+    'HRV=',
+    '',
     '# Mindset',
     'MOOD=',
     'STRESS=',
     'SLEEP_QUALITY=',
-    'SLEEP_HRS=',
     'NOTES=',
     '',
   ].join('\n');
@@ -548,7 +552,10 @@ export default function Page() {
       `• Calories: ${n.calories || '—'}`, `• Target: ${n.calorieTarget || '—'} kcal`,
       `• Macros: Carbs ${n.carbsG || '—'} g | Protein ${n.proteinG || '—'} g | Fat ${n.fatG || '—'} g | Fibre ${n.fibreG || '—'} g`,
       '',
-      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5 · Sleep ${m.sleepHrs || '—'} · Sleep Q ${m.sleepQuality || '—'}/5`,
+      'Recovery',
+      `• Sleep ${m.sleepHrs || '—'} (Q ${m.sleepQuality || '—'}/5) · RHR ${m.rhr || '—'} bpm · HRV ${m.hrv || '—'} ms`,
+      '',
+      `Mindset — Mood ${m.mood || '—'}/5 · Stress ${m.stress || '—'}/5`,
     ].filter(Boolean);
     return (lines as string[]).join('\n');
   }, [entry]);
@@ -581,7 +588,15 @@ export default function Page() {
     const run = { distanceKm: map['DIST_KM'], durationMin: map['DURATION_MIN'], pace: map['PACE'], hrAvg: map['HR_AVG'], hrMax: map['HR_MAX'], cadence: map['CADENCE'], strideM: map['STRIDE_M'], elevUp: map['ELEV_UP'], elevDown: map['ELEV_DOWN'], calories: map['KCAL_RUN'], sweatLossL: map['SWEAT_LOSS_L'], rpe: map['RPE'] };
     const strength = { description: map['STRENGTH_DESC'], rounds: map['STRENGTH_ROUNDS'], calories: map['STRENGTH_KCAL'], weightLbs: map['STRENGTH_WEIGHT_LBS'] };
     const nutrition = {calories: map['CALORIES'], carbsG: map['CARBS_G'], proteinG: map['PROTEIN_G'], fatG: map['FAT_G'], fibreG: map['FIBRE_G'], calorieTarget: map['CALORIE_TARGET'],};
-    const mindset = { mood: map['MOOD'], stress: map['STRESS'], sleepQuality: map['SLEEP_QUALITY'], sleepHrs: map['SLEEP_HRS'], notes: map['NOTES'] };
+    const mindset = { 
+      mood: map['MOOD'], 
+      stress: map['STRESS'], 
+      sleepQuality: map['SLEEP_QUALITY'], 
+      sleepHrs: map['SLEEP_HRS'], 
+      rhr: map['RHR'], 
+      hrv: map['HRV'], 
+      notes: map['NOTES'] 
+    };
     const entry: Entry = { date: parsedDate, workout: { run, strength }, nutrition, mindset };
     const calorieTarget = map['CALORIE_TARGET'] ? Number(map['CALORIE_TARGET']) : undefined;
     return { date: parsedDate, entry, calorieTarget };
@@ -947,16 +962,22 @@ export default function Page() {
         </div>
       </div>
 
-    <div className="card space-y-3">
+      <div className="card space-y-3">
+        <h3 className="text-lg font-medium">Recovery</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {hhmm('Sleep (hh:mm)', 'mindset.sleepHrs', entry.mindset.sleepHrs, update)}
+          {num('Resting HR (bpm)', 'mindset.rhr', (entry.mindset as any).rhr, update)}
+          {num('HRV (ms)', 'mindset.hrv', (entry.mindset as any).hrv, update)}
+        </div>
+      </div>
+
+      <div className="card space-y-3">
         <h3 className="text-lg font-medium">Mindset</h3>
-      
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {range('Mood (1–5)', 'mindset.mood', entry.mindset.mood, update)}
           {range('Stress (1–5)', 'mindset.stress', entry.mindset.stress, update)}
           {range('Sleep Quality (1–5)', 'mindset.sleepQuality', entry.mindset.sleepQuality, update)}
-          {hhmm('Sleep (hh:mm)', 'mindset.sleepHrs', entry.mindset.sleepHrs, update)}
         </div>
-      
         <div>
           <div className="label">Notes</div>
           <textarea

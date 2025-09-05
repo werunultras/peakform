@@ -616,7 +616,7 @@ const rhrCorridorData = useMemo(() => {
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
     const lines = [
       "Write a reflective, first-person daily fitness journal entry based on the following structured data. Focus on tone over metrics — translate the numbers into meaningful insight. Highlight training load and perceived effort, progress vs goals (e.g., calorie or macro intake), and recovery signals (e.g., HRV, sleep, mood). Use natural, fluent language, avoid bullet points, and don't repeat all metrics verbatim — synthesise instead. Mention anything noteworthy, such as strong runs, under-fuelling, or positive mindset shifts. Keep it concise, no more than one paragraph.",
-      '',
+      '', //
       'Training — Today',
       r.distanceKm || r.durationMin || r.pace ? `• Run: ${fmt(r.distanceKm,'km')} · ${fmt(r.durationMin,'min')} · ${fmt(r.pace,'pace')}` : null,
       r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg,'avg')} / ${fmt(r.hrMax,'max')}` : null,
@@ -1130,12 +1130,23 @@ const rhrCorridorData = useMemo(() => {
         </div>
       </div>
 
+      <div className="grid-2">
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">End-of-day prompt</h3>
+          <textarea className="input h-40" readOnly value={endOfDayPrompt} />
+          <div className="flex justify-end">
+            <button className="btn" onClick={copyPrompt}>Copy</button>
+          </div>
+        </div>
 
-      <div className="card space-y-2">
-        <h3 className="text-lg font-medium">End-of-day prompt</h3>
-        <textarea className="input h-40" readOnly value={endOfDayPrompt} />
-        <div className="flex justify-end">
-          <button className="btn" onClick={copyPrompt}>Copy</button>
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Journal</h3>
+          <textarea
+            className="input h-40"
+            value={(entry.mindset as any).journal || ''}
+            onChange={(e) => update('mindset.journal', e.target.value)}
+            placeholder="Write a holistic wrap‑up of your day: how you felt, what stood out, lessons for tomorrow…"
+          />
         </div>
       </div>
     </div>

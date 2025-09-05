@@ -964,75 +964,68 @@ const rhrCorridorData = useMemo(() => {
     </div>
   </div>
 
-  {/* Readiness — 14d trend with 28d corridor */}
-  <div className="card space-y-2">
-    <h3 className="text-lg font-medium">Readiness — 14‑day trend</h3>
-    <div className="h-56">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={readinessTrend14} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
-          <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-          <Tooltip
-            formatter={(v: any, n: any, { payload }: any) => {
-              if (n === 'Readiness') return [`${Math.round(Number(v))}`, 'Readiness'];
-              if (n === 'Band') {
-                const low = payload.baseLow;
-                const high = low != null ? low + payload.band : null;
-                return high != null ? [`${Math.round(low)}–${Math.round(high)}`, 'Baseline'] : ['—', 'Baseline'];
-              }
-              return [v, n];
-            }}
-            labelFormatter={(label) => `Date: ${label}`}
-          />
-          {/* Corridor band */}
-          <Area type="monotone" dataKey="baseLow" stackId="rb" stroke="none" fill="transparent" isAnimationActive={false} />
-          <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#fc4c02" fillOpacity={0.12} isAnimationActive={false} name="Band" />
-          {/* Rounded orange bars */}
-          <Bar dataKey="score" name="Readiness" barSize={18} fill="#fc4c02" radius={[6,6,0,0]} />
-        </ComposedChart>
-      </ResponsiveContainer>
+  {/* Calendar card replaces Readiness card */}
+  <div className="card space-y-3">
+    <h3 className="text-lg font-medium">Calendar</h3>
+    <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+    <div className="space-y-2">
+      {calendarWeeks.map((week, wi) => (
+        <div key={wi} className="grid grid-cols-7 gap-2">
+          {week.map((day) => (
+            <div key={day.iso} className="flex items-center justify-center">
+              <div
+                className={'w-8 h-8 rounded-full border flex items-center justify-center ' + (day.status === 'train' ? 'text-white border-black' : day.status === 'nut' ? 'text-white border-black' : 'border-black')}
+                style={day.status === 'train' ? { backgroundColor: '#fc4c02', borderColor: '#000' } : day.status === 'nut' ? { backgroundColor: '#ff955c', borderColor: '#000' } : undefined}
+                title={day.iso}
+              >
+                <span className="text-[11px] leading-none">{day.dayNum}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+    <div className="pt-3 flex items-center justify-center gap-6 text-xs text-neutral-600">
+      <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#ff955c' }}></span>Nutrition only</span>
+      <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#fc4c02' }}></span>Nutrition + training</span>
     </div>
   </div>
       </div>
 
       {/* Calendar (left) + Journal (right) */}
       <div className="grid-2">
-        <div className="card space-y-3">
-          <h3 className="text-lg font-medium">Calendar</h3>
-          <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
-            <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
-          </div>
-          <div className="space-y-2">
-            {calendarWeeks.map((week, wi) => (
-              <div key={wi} className="grid grid-cols-7 gap-2">
-                {week.map((day) => (
-                  <div key={day.iso} className="flex items-center justify-center">
-                    <div
-                      className={
-                        'w-8 h-8 rounded-full border flex items-center justify-center ' +
-                        (day.status === 'train'
-                          ? 'text-white border-black'
-                          : day.status === 'nut'
-                          ? 'text-white border-black'
-                          : 'border-black')
-                      }
-                      style={day.status === 'train'
-                        ? { backgroundColor: '#fc4c02', borderColor: '#000' }
-                        : day.status === 'nut'
-                        ? { backgroundColor: '#ff955c', borderColor: '#000' }
-                        : undefined}
-                      title={day.iso}
-                    >
-                      <span className="text-[11px] leading-none">{day.dayNum}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="pt-3 flex items-center justify-center gap-6 text-xs text-neutral-600">
-            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#ff955c' }}></span>Nutrition only</span>
-            <span className="inline-flex items-center"><span className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: '#fc4c02' }}></span>Nutrition + training</span>
+        <div className="card space-y-2">
+          <h3 className="text-lg font-medium">Readiness — 14‑day trend</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={readinessTrend14} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                <Tooltip
+                  formatter={(v: any, n: any, { payload }: any) => {
+                    if (n === 'Readiness') return [`${Math.round(Number(v))}`, 'Readiness'];
+                    if (n === 'Band') {
+                      const low = payload.baseLow;
+                      const high = low != null ? low + payload.band : null;
+                      return high != null ? [`${Math.round(low)}–${Math.round(high)}`, 'Baseline'] : ['—', 'Baseline'];
+                    }
+                    return [v, n];
+                  }}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                {/* Corridor band */}
+                <Area type="monotone" dataKey="baseLow" stackId="rb" stroke="none" fill="transparent" isAnimationActive={false} />
+                <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#fc4c02" fillOpacity={0.12} isAnimationActive={false} name="Band" />
+                {/* Rounded bars with orange theme by zone */}
+                <Bar dataKey="score" name="Readiness" barSize={18} radius={[6,6,0,0]}>
+                  {readinessTrend14.map((d, i) => (
+                    <Cell key={i} fill={d.score < 40 ? '#d63b00' : d.score < 70 ? '#ff955c' : '#ffd1bd'} />
+                  ))}
+                </Bar>
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -1338,7 +1331,7 @@ const rhrCorridorData = useMemo(() => {
 
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Mindset</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {range('Mood (1–5)', 'mindset.mood', entry.mindset.mood, update)}
           {range('Stress (1–5)', 'mindset.stress', entry.mindset.stress, update)}
           {range('Sleep Quality (1–5)', 'mindset.sleepQuality', entry.mindset.sleepQuality, update)}

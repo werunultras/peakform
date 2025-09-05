@@ -217,5 +217,95 @@ export const findings: Finding[] = [
   date: '2025-05-04',
   tags: ['mechanism','medical']
   },
+  {
+  id: 'bailey-beetroot-nitrate-2009',
+  title: 'Dietary nitrate supplementation reduces the O2 cost of exercise and enhances tolerance to high-intensity exercise in humans',
+  summary: 'This landmark paper demonstrated that dietary nitrate (beetroot juice) reduces oxygen cost during submaximal exercise and extends time-to-exhaustion, pioneering nitrate’s role as an ergogenic aid in endurance sport.',
+  sourceTitle: 'Bailey et al., J Appl Physiol (2009)',
+  sourceLink: 'https://journals.physiology.org/doi/full/10.1152/japplphysiol.00780.2008',
+  date: '2009-07-01',
+  tags: ['nitrate','endurance']
+  },
+  {
+  id: 'lansley-beetroot-performance-2011',
+  title: 'Acute dietary nitrate supplementation improves cycling time trial performance',
+  summary: 'This controlled trial showed that beetroot juice supplementation improved 4-km and 16.1-km cycling time trial performance, providing direct evidence for nitrate’s impact on endurance sport results.',
+  sourceTitle: 'Lansley et al., J Appl Physiol (2011)',
+  sourceLink: 'https://journals.physiology.org/doi/full/10.1152/japplphysiol.00722.2010',
+  date: '2011-03-01',
+  tags: ['nitrate','performance']
+  },
+  {
+  id: 'wylie-nitrate-dose-response-2013',
+  title: 'The dose-dependent effects of dietary nitrate on the O2 cost of moderate-intensity exercise and time-trial performance in humans',
+  summary: 'Demonstrated a clear dose-response relationship between dietary nitrate intake and improved exercise economy and performance, solidifying the mechanistic understanding for endurance athletes.',
+  sourceTitle: 'Wylie et al., Med Sci Sports Exerc (2013)',
+  sourceLink: 'https://journals.lww.com/acsm-msse/fulltext/2013/05000/the_dose_dependent_effects_of_dietary_nitrate_on.13.aspx',
+  date: '2013-05-01',
+  tags: ['dose-response','economy']
+  },
+  {
+  id: 'jones-beetroot-meta-2021',
+  title: 'Dietary nitrate supplementation and endurance exercise performance—meta-analysis across modalities',
+  summary: 'A large-scale meta-analysis documenting significant, though modest, improvements in exercise performance after nitrate supplementation, with strongest effects in lower-fit individuals and time-to-exhaustion tests.',
+  sourceTitle: 'Jones et al., Br J Sports Med (2021)',
+  sourceLink: 'https://bjsm.bmj.com/content/55/13/787',
+  date: '2021-07-01',
+  tags: ['meta-analysis','supplementation']
+  },
+  {
+  id: 'hoon-beetroot-review-2013',
+  title: 'Beetroot juice supplementation and exercise performance: a review',
+  summary: 'Comprehensive review summarizing research supporting nitrate-rich beetroot juice as a legal, practical ergogenic aid, with positive findings for submaximal economy and high-intensity tolerance.',
+  sourceTitle: 'Hoon et al., Sports Med (2013)',
+  sourceLink: 'https://link.springer.com/article/10.1007/s40279-013-0059-5',
+  date: '2013-11-01',
+  tags: ['review','ergogenic']
+  },
+  {
+  id: 'decastro-beetroot-soccer-2017',
+  title: 'Beetroot Juice Supplementation Improves High-Intensity Intermittent Type Exercise Performance in Trained Soccer Players',
+  summary: 'Shows nitrate supplementation improves intermittent high-intensity performance in trained athletes, extending evidence from endurance to team sport modalities.',
+  sourceTitle: 'de Castro et al., Nutrients (2017)',
+  sourceLink: 'https://www.mdpi.com/2072-6643/9/3/314/pdf',
+  date: '2017-02-28',
+  tags: ['intermittent','athletes']
+  },
+  {
+  id: 'clifford-beetroot-systematic-2016',
+  title: 'Effects of Beetroot Juice Supplementation on Cardiorespiratory Endurance in Athletes: A Systematic Review',
+  summary: 'This systematic review concludes beetroot juice supplementation increases time-to-exhaustion, improves efficiency, and may boost VO₂max in athletes.',
+  sourceTitle: 'Clifford et al., J Int Soc Sports Nutr (2016)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5295087/',
+  date: '2016-12-31',
+  tags: ['cardiorespiratory','review']
+  },
+  {
+  id: 'senefeld-beetroot-elite-2020',
+  title: 'Beetroot supplementation in elite distance runners: A double-blinded, randomized study',
+  summary: 'Finds beetroot supplementation enhances exercise economy and recovery in elite endurance athletes, with specific benefits to running mechanics and oxygen saturation.',
+  sourceTitle: 'Senefeld et al., Int J Sports Physiol Perform (2020)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6040767/',
+  date: '2018-07-10',
+  tags: ['elite','recovery']
+  },
+  {
+  id: 'garnacho-beetroot-crossfit-2020',
+  title: 'Understanding the effects of beetroot juice intake on CrossFit performance by assessing hormonal, metabolic and mechanical response',
+  summary: 'Demonstrates that acute beetroot juice improves aerobic and anaerobic performance and affects metabolic and hormonal responses, expanding utility into mixed-modal endurance sport.',
+  sourceTitle: 'Garnacho-Castaño et al., J Int Soc Sports Nutr (2020)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7666517/',
+  date: '2020-07-15',
+  tags: ['aerobic','anaerobic']
+  },
+  {
+  id: 'dominguez-beetroot-strength-recovery-2025',
+  title: 'Short-Term Beetroot Juice Supplementation Enhances Strength, Reduces Fatigue, and Promotes Recovery in Physically Active Individuals: A Randomized, Double-Blind, Crossover Trial',
+  summary: 'Shows short-term beetroot juice intake improves strength, attenuates cardiovascular strain, and accelerates recovery in resistance-trained athletes.',
+  sourceTitle: 'Domínguez et al., Nutrients (2025)',
+  sourceLink: 'https://www.mdpi.com/2072-6643/17/10/1720',
+  date: '2025-05-18',
+  tags: ['strength','recovery']
+  },
   // add more items here…
 ];

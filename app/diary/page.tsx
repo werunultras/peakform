@@ -793,6 +793,7 @@ const rhrCorridorData = useMemo(() => {
 
   const n = entry.nutrition;
   const todayScore = readinessData.length ? readinessData[readinessData.length - 1].score : 0;
+  const gaugeColor = todayScore < 40 ? '#ef4444' : todayScore < 70 ? '#f59e0b' : '#22c55e';
 
   // ---------- View ----------
   return (
@@ -895,17 +896,13 @@ const rhrCorridorData = useMemo(() => {
           data={[{ name: 'Readiness', value: todayScore }]}
         >
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar dataKey="value" cornerRadius={12} background={{ fill: '#eee' }} fill="#fc4c02" />
+          <RadialBar dataKey="value" cornerRadius={12} background={{ fill: '#eee' }} fill={gaugeColor} />
         </RadialBarChart>
         {/* Value centered inside gauge */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-5xl font-semibold tabular-nums">{todayScore}</div>
         </div>
       </div>
-    </div>
-    {/* Legend bottom centered */}
-    <div className="text-center text-xs text-neutral-600 pb-4">
-      0–40 low · 40–70 moderate · 70–100 good
     </div>
   </div>
       </div>

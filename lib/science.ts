@@ -118,5 +118,104 @@ export const findings: Finding[] = [
     date: '2025-02-28',
     tags: ['resilience','training']
   },
+  {
+  id: 'harris-creatine-loading-1992',
+  title: 'Elevation of creatine in human muscle via oral creatine supplementation',
+  summary: 'This landmark study established that oral creatine supplementation rapidly increases muscle creatine and phosphocreatine, laying the foundation for creatine’s ergogenic applications in sport.',
+  sourceTitle: 'Harris et al., Clin Sci (1992)',
+  sourceLink: 'https://doi.org/10.1042/cs0830367',
+  date: '1992-07-01',
+  tags: ['ergogenic','muscle']
+  },
+  {
+  id: 'kreider-issn-position-2017',
+  title: 'International Society of Sports Nutrition position stand: safety and efficacy of creatine supplementation in exercise, sport, and medicine',
+  summary: 'The ISSN’s position stand synthesizes decades of research, confirming creatine’s efficacy, safety, and broad benefits for athletic performance and recovery.',
+  sourceTitle: 'Kreider et al., J Int Soc Sports Nutr (2017)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/',
+  date: '2017-06-12',
+  tags: ['safety','performance']
+  },
+  {
+  id: 'persky-brazeau-creatine-2001',
+  title: 'Clinical pharmacology of creatine supplementation',
+  summary: 'This review critically analyzed creatine’s pharmacokinetics, tissue distribution, and proposed mechanisms, providing foundational context for dosing and supplementation strategies.',
+  sourceTitle: 'Persky & Brazeau, Sports Med (2001)',
+  sourceLink: 'https://pubmed.ncbi.nlm.nih.gov/11219499/',
+  date: '2001-02-01',
+  tags: ['pharmacology','mechanisms']
+  },
+  {
+  id: 'tarnopolsky-neurology-creatine-2000',
+  title: 'Creatine monohydrate enhances physical performance in muscular dystrophy patients',
+  summary: 'Creatine supplementation improved strength and functional capacity in patients with neuromuscular disease, suggesting clinical value beyond sport.',
+  sourceTitle: 'Tarnopolsky et al., Neurology (2000)',
+  sourceLink: 'https://pubmed.ncbi.nlm.nih.gov/10680805/',
+  date: '2000-02-01',
+  tags: ['clinical','strength']
+  },
+  {
+  id: 'rawson-volek-creatine-2003',
+  title: 'Effects of creatine supplementation and resistance training on muscle strength and hypertrophy',
+  summary: 'This meta-analysis provided strong evidence that creatine, combined with training, significantly enhances muscle mass and strength compared to placebo.',
+  sourceTitle: 'Rawson & Volek, Med Sci Sports Exerc (2003)',
+  sourceLink: 'https://pubmed.ncbi.nlm.nih.gov/12594046/',
+  date: '2003-02-01',
+  tags: ['strength','hypertrophy']
+  },
+  {
+  id: 'rae-cognition-creatine-2003',
+  title: 'Oral creatine monohydrate supplementation improves brain performance: a double–blind, placebo–controlled, cross–over trial',
+  summary: 'This trial showed creatine supplementation improves cognitive function and working memory, pioneering research on non-muscular effects.',
+  sourceTitle: 'Rae et al., Proc R Soc Lond B Biol Sci (2003)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC1691485/',
+  date: '2003-10-21',
+  tags: ['cognition','brain']
+  },
+  {
+  id: 'candow-creatine-strength-metaanalysis-2024',
+  title: 'Effects of Creatine Supplementation and Resistance Training on Muscle Strength Gains in Adults <50 Years of Age: A Systematic Review and Meta-Analysis',
+  summary: 'Meta-analysis demonstrated significant strength gains in adults <50 years supplementing with creatine during resistance training, with high-dose regimens yielding maximal increases.',
+  sourceTitle: 'Candow et al., Nutrients (2024)',
+  sourceLink: 'https://www.mdpi.com/2072-6643/16/21/3665',
+  date: '2024-10-27',
+  tags: ['strength','training']
+  },
+  {
+  id: 'kreider-forms-efficacy-safety-2003',
+  title: 'Analysis of the efficacy, safety, and regulatory status of novel forms of creatine',
+  summary: 'Comparative analysis confirmed creatine monohydrate as the most effective, safest, and best-studied form, supporting global regulatory approval and guiding supplement choice.',
+  sourceTitle: 'Kreider et al., J Sports Sci Med (2003)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3080578/',
+  date: '2011-03-21',
+  tags: ['efficacy','regulation']
+  },
+  {
+  id: 'sale-creatine-females-2024',
+  title: 'Does Creatine Supplementation Enhance Performance in Active Females? A Systematic Review',
+  summary: 'Systematic review showed limited but growing evidence for creatine’s performance benefits in active females, with call for improved study design and reporting.',
+  sourceTitle: 'Sale et al., Nutrients (2024)',
+  sourceLink: 'https://www.mdpi.com/2072-6643/17/2/238',
+  date: '2024-12-31',
+  tags: ['female','performance']
+  },
+  {
+  id: 'smith-creatine-muscle-growth-2022',
+  title: 'Creatine Supplementation for Muscle Growth: A Scoping Review of Randomized Clinical Trials from 2012 to 2021',
+  summary: 'Scoping review of RCTs confirmed positive effects of creatine on muscle growth across diverse populations, with efficacy varying by age and baseline activity.',
+  sourceTitle: 'Smith et al., Nutrients (2022)',
+  sourceLink: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8949037/',
+  date: '2022-02-28',
+  tags: ['muscle-growth','RCT']
+  },
+  {
+  id: 'schedel-creatine-mechanism-2023',
+  title: 'Creatine as a Compound and Supplement: Metabolism, Mechanism of Action, Effects, and Adverse Effects - A Review',
+  summary: 'Comprehensive review presents current knowledge of creatine’s mechanisms, ergogenic and medical uses, and highlights neuroprotective, metabolic, and radioprotective properties.',
+  sourceTitle: 'Schedel et al., Nutrients (2023)',
+  sourceLink: 'https://apcz.umk.pl/QS/article/view/60164',
+  date: '2025-05-04',
+  tags: ['mechanism','medical']
+  },
   // add more items here…
 ];

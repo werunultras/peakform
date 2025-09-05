@@ -792,6 +792,7 @@ const rhrCorridorData = useMemo(() => {
   );
 
   const n = entry.nutrition;
+  const todayScore = readinessData.length ? readinessData[readinessData.length - 1].score : 0;
 
   // ---------- View ----------
   return (
@@ -878,50 +879,35 @@ const rhrCorridorData = useMemo(() => {
   </div>
 
   {/* Readiness gauge */}
-  <div className="card">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-      {/* Gauge */}
-      <div className="flex justify-center md:col-span-1">
+  <div className="card relative">
+    {/* Title top-left */}
+    <div className="absolute top-4 left-4 text-lg font-medium">Readiness</div>
+    {/* Gauge centered */}
+    <div className="flex items-center justify-center py-6">
+      <div className="relative" style={{ width: 260, height: 260 }}>
         <RadialBarChart
-          width={200}
-          height={200}
-          innerRadius={80}
-          outerRadius={100}
+          width={260}
+          height={260}
+          innerRadius={100}
+          outerRadius={120}
           startAngle={225}
           endAngle={-45}
-          data={[
-            { name: 'Readiness', value: readinessData[readinessData.length - 1]?.score ?? 0 },
-          ]}
+          data={[{ name: 'Readiness', value: todayScore }]}
         >
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar dataKey="value" cornerRadius={8} background={{ fill: '#eee' }} fill="#fc4c02" />
+          <RadialBar dataKey="value" cornerRadius={12} background={{ fill: '#eee' }} fill="#fc4c02" />
         </RadialBarChart>
+        {/* Value centered inside gauge */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-5xl font-semibold tabular-nums">{todayScore}</div>
+        </div>
       </div>
-
-      {/* Today + sparkline */}
-      <div className="space-y-1 text-center md:text-left md:col-span-2">
-        <h3 className="text-lg font-medium">Readiness</h3>
-        <div className="text-4xl font-semibold tabular-nums">
-          {readinessData[readinessData.length - 1]?.score ?? 0}
-        </div>
-        <div className="text-xs text-neutral-600">0–40 low · 40–70 moderate · 70–100 good</div>
-
-        <div className="h-16 mt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={readinessData.slice(-14)} margin={{ left: 8, right: 8, top: 4, bottom: 0 }}>
-              <XAxis dataKey="date" tick={false} />
-              <YAxis domain={[0, 100]} tick={false} />
-              <Tooltip formatter={(v) => [`${v} / 100`, 'Readiness']} />
-              <ReferenceArea y1={0} y2={40}  fill="#ef4444" fillOpacity={0.08} />
-              <ReferenceArea y1={40} y2={70} fill="#f59e0b" fillOpacity={0.08} />
-              <ReferenceArea y1={70} y2={100} fill="#22c55e" fillOpacity={0.08} />
-              <Line type="monotone" dataKey="score" stroke="#fc4c02" strokeWidth={2} dot={false} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-          </div>
-            </div>
-          </div>
+    </div>
+    {/* Legend bottom centered */}
+    <div className="text-center text-xs text-neutral-600 pb-4">
+      0–40 low · 40–70 moderate · 70–100 good
+    </div>
+  </div>
       </div>
 
       {/* Calendar (left) + Journal (right) */}

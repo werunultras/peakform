@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend } from 'recharts';
+import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, RadialBarChart, RadialBar, PolarAngleAxis, } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -458,6 +458,98 @@ export default function Page() {
     return out;
   }, [entries]);
 
+// ---------- Readiness helpers ----------
+function clamp(n: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, n)); }
+function safeZ(x: number, mean: number, sd: number) {
+  if (!Number.isFinite(x) || !Number.isFinite(mean) || !Number.isFinite(sd) || sd <= 0) return 0;
+  return (x - mean) / sd;
+}
+
+/**
+ * Readiness score 0–100 over last 28 days.
+ * Weights: HRV 0.35, RHR 0.25, Sleep 0.25, Mood/Stress 0.15
+ * - HRV: z vs prior 28d (higher better)
+ * - RHR: z vs prior 28d (lower better, inverted)
+ * - Sleep: 7-day avg vs 7.5h target (±2h cap)
+ * - Mood (1–5) and Stress (1–5 inverted) mapped to 0..1
+ */
+const readinessData = useMemo(() => {
+  const targetSleep = 7.5;
+  const out: { date: string; score: number }[] = [];
+
+  for (let i = 0; i < 28; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - (27 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const e = entries[iso];
+
+    const hrv = e ? toNumHRV(e.mindset?.hrv) : 0;
+    const rhr = e ? toNum(e.mindset?.rhr) : 0;
+
+    // Sleep 7d avg including today
+    let sleepSum = 0, sleepCnt = 0;
+    for (let k = 0; k < 7; k++) {
+      const dd = new Date(d); dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0,10);
+      const se = entries[key];
+      const hrs = se ? hhmmToHours(se.mindset?.sleepHrs) : 0;
+      if (hrs > 0) { sleepSum += hrs; sleepCnt++; }
+    }
+    const sleep7 = sleepCnt ? sleepSum / sleepCnt : 0;
+
+    const mood   = e ? toNum(e.mindset?.mood)   : 0; // 1..5
+    const stress = e ? toNum(e.mindset?.stress) : 0; // 1..5
+
+    // Baselines from prior 28 days (exclude today)
+    const hrvVals: number[] = [];
+    const rhrVals: number[] = [];
+    for (let k = 1; k <= 28; k++) {
+      const dd = new Date(d); dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0,10);
+      const ee = entries[key];
+      const hv = ee ? toNumHRV(ee.mindset?.hrv) : 0;
+      const rv = ee ? toNum(ee.mindset?.rhr) : 0;
+      if (hv > 0) hrvVals.push(hv);
+      if (rv > 0) rhrVals.push(rv);
+    }
+
+    const hrvMean = hrvVals.length ? hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length : 0;
+    const hrvSd   = hrvVals.length ? Math.sqrt(hrvVals.reduce((a,b)=>a+(b-hrvMean)**2,0)/hrvVals.length) : 0;
+    const rhrMean = rhrVals.length ? rhrVals.reduce((a,b)=>a+b,0)/rhrVals.length : 0;
+    const rhrSd   = rhrVals.length ? Math.sqrt(rhrVals.reduce((a,b)=>a+(b-rhrMean)**2,0)/rhrVals.length) : 0;
+
+    let zHRV = safeZ(hrv, hrvMean, hrvSd);     // higher better
+    let zRHR = -safeZ(rhr, rhrMean, rhrSd);    // lower better (invert)
+    zHRV = clamp(zHRV, -2.5, 2.5);
+    zRHR = clamp(zRHR, -2.5, 2.5);
+
+    // Map z ~[-2.5..2.5] -> [0..1]
+    const mapZ = (z: number) => (z + 2.5) / 5.0;
+    const hrvScore = mapZ(zHRV);
+    const rhrScore = mapZ(zRHR);
+
+    // Sleep score: deviation from 7.5h, ±2h cap -> [0..1]
+    const sleepDev   = clamp(sleep7 - targetSleep, -2, 2);
+    const sleepScore = (sleepDev + 2) / 4;
+
+    // Mood (1–5) -> -1..+1 -> 0..1  |  Stress (1–5) inverted
+    const mood01    = mood ? clamp((mood - 3) / 2, -1, 1) * 0.5 + 0.5 : 0.5;
+    const stressInv = stress ? (6 - stress) : 3; // 1..5 -> 5..1
+    const stress01  = clamp((stressInv - 3) / 2, -1, 1) * 0.5 + 0.5;
+
+    const readiness01 =
+      0.35 * hrvScore +
+      0.25 * rhrScore +
+      0.25 * sleepScore +
+      0.15 * ((mood01 + stress01) / 2);
+
+    const score = Math.round(clamp(readiness01 * 100, 0, 100));
+    out.push({ date: iso.slice(5), score });
+  }
+
+  return out;
+}, [entries]);
+
 // helper: HRV numeric
 function toNumHRV(v: any) {
   const n = Number(String(v ?? '').replace(/[^0-9.-]/g, ''));
@@ -616,7 +708,7 @@ const rhrCorridorData = useMemo(() => {
     const fmt = (v: any, sfx = '') => (v ? `${v} ${sfx}` : '—');
     const lines = [
       "Write a reflective, first-person daily fitness journal entry based on the following structured data. Focus on tone over metrics — translate the numbers into meaningful insight. Highlight training load and perceived effort, progress vs goals (e.g., calorie or macro intake), and recovery signals (e.g., HRV, sleep, mood). Use natural, fluent language, avoid bullet points, and don't repeat all metrics verbatim — synthesise instead. Mention anything noteworthy, such as strong runs, under-fuelling, or positive mindset shifts. Keep it concise, no more than one paragraph.",
-      '', ////
+      '',   //
       'Training — Today',
       r.distanceKm || r.durationMin || r.pace ? `• Run: ${fmt(r.distanceKm,'km')} · ${fmt(r.durationMin,'min')} · ${fmt(r.pace,'pace')}` : null,
       r.hrAvg || r.hrMax ? `  HR: ${fmt(r.hrAvg,'avg')} / ${fmt(r.hrMax,'max')}` : null,
@@ -756,28 +848,80 @@ const rhrCorridorData = useMemo(() => {
       </div>
 
 
-      {/* Today — Summary (full-width) */}
-      <div className="card space-y-2">
-        <h3 className="text-lg font-medium">Today — Summary</h3>
-        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 text-sm">
-          {/* 8 items in one row */}
-          <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
-          <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
-          <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
-          <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
-          <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
-          <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="5–6g/kg" />
-          <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="1.4–1.8g/kg" />
-          <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="0.5–1g/kg" />
+{/* Today — Summary + Readiness */}
+<div className="grid-2">
+  {/* Summary (2 rows) */}
+  <div className="card space-y-2">
+    <h3 className="text-lg font-medium">Today — Summary</h3>
+    {/* Row 1 */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+      <Stat label="Distance" value={fmtNum(toNum(entry.workout?.run?.distanceKm))} />
+      <Stat label="Duration" value={fmtNum(toNum(entry.workout?.run?.durationMin))} />
+      <Stat label="Pace" value={entry.workout?.run?.pace || '—'} />
+      <Stat label="HR avg" value={fmtNum(toNum(entry.workout?.run?.hrAvg))} />
+    </div>
+    {/* Row 2 */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+      <Stat label="Calories" value={fmtNum(totals.calories)} sub={`Target ${fmtNum(totals.dayTarget)}`} />
+      <Stat label="Carbs (g)" value={fmtNum(totals.carbsG)} sub="5–6g/kg" />
+      <Stat label="Protein (g)" value={fmtNum(totals.proteinG)} sub="1.4–1.8g/kg" />
+      <Stat label="Fat (g)" value={fmtNum(totals.fatG)} sub="0.5–1g/kg" />
+    </div>
+    <div className="text-sm">
+      Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
+      {totals.deficit > 0
+        ? `(${fmtNum(totals.deficit)} kcal below target)`
+        : totals.deficit < 0
+        ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
+        : '(on target)'}
+    </div>
+  </div>
+
+  {/* Readiness gauge */}
+  <div className="card">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+      {/* Gauge */}
+      <div className="flex justify-center md:col-span-1">
+        <RadialBarChart
+          width={200}
+          height={200}
+          innerRadius={80}
+          outerRadius={100}
+          startAngle={225}
+          endAngle={-45}
+          data={[
+            { name: 'Readiness', value: readinessData[readinessData.length - 1]?.score ?? 0 },
+          ]}
+        >
+          <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+          <RadialBar dataKey="value" cornerRadius={8} background={{ fill: '#eee' }} fill="#fc4c02" />
+        </RadialBarChart>
+      </div>
+
+      {/* Today + sparkline */}
+      <div className="space-y-1 text-center md:text-left md:col-span-2">
+        <h3 className="text-lg font-medium">Readiness</h3>
+        <div className="text-4xl font-semibold tabular-nums">
+          {readinessData[readinessData.length - 1]?.score ?? 0}
         </div>
-        <div className="text-sm">
-          Status: <span className="font-medium capitalize">{totals.balance}</span>{' '}
-          {totals.deficit > 0
-            ? `(${fmtNum(totals.deficit)} kcal below target)`
-            : totals.deficit < 0
-            ? `(${fmtNum(Math.abs(totals.deficit))} kcal above target)`
-            : '(on target)'}
+        <div className="text-xs text-neutral-600">0–40 low · 40–70 moderate · 70–100 good</div>
+
+        <div className="h-16 mt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={readinessData.slice(-14)} margin={{ left: 8, right: 8, top: 4, bottom: 0 }}>
+              <XAxis dataKey="date" tick={false} />
+              <YAxis domain={[0, 100]} tick={false} />
+              <Tooltip formatter={(v) => [`${v} / 100`, 'Readiness']} />
+              <ReferenceArea y1={0} y2={40}  fill="#ef4444" fillOpacity={0.08} />
+              <ReferenceArea y1={40} y2={70} fill="#f59e0b" fillOpacity={0.08} />
+              <ReferenceArea y1={70} y2={100} fill="#22c55e" fillOpacity={0.08} />
+              <Line type="monotone" dataKey="score" stroke="#fc4c02" strokeWidth={2} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
         </div>
+          </div>
+            </div>
+          </div>
       </div>
 
       {/* Calendar (left) + Journal (right) */}

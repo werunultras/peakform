@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, RadialBarChart, RadialBar, PolarAngleAxis, } from 'recharts';
+import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, RadialBarChart, RadialBar, PolarAngleAxis, Cell, } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
 
@@ -792,8 +792,6 @@ const rhrCorridorData = useMemo(() => {
   );
 
   const n = entry.nutrition;
-  const todayScore = readinessData.length ? readinessData[readinessData.length - 1].score : 0;
-  const gaugeColor = todayScore < 40 ? '#ef4444' : todayScore < 70 ? '#f59e0b' : '#22c55e';
 
   // ---------- View ----------
   return (
@@ -879,47 +877,90 @@ const rhrCorridorData = useMemo(() => {
     </div>
   </div>
 
-  {/* Readiness gauge */}
-  <div className="card relative">
-    {/* Title top-left */}
-    <div className="absolute top-4 left-4 text-lg font-medium">Readiness</div>
-
-    {/* Gauge centered */}
-    <div className="flex items-center justify-center pt-8 pb-2">
-      <div className="relative" style={{ width: 280, height: 240 }}>
-        <RadialBarChart
-          width={280}
-          height={240}
-          innerRadius={105}
-          outerRadius={125}
-          startAngle={225}
-          endAngle={-45}
-          data={[{ name: 'Readiness', value: todayScore }]}
-        >
-          <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar dataKey="value" cornerRadius={12} background={{ fill: '#eee' }} fill={gaugeColor} />
-        </RadialBarChart>
-        {/* Value centered inside gauge */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-5xl font-semibold tabular-nums">{todayScore}</div>
-        </div>
-      </div>
-    </div>
-
-    {/* Compact 14‑day sparkline to use remaining space */}
-    <div className="h-16 px-6 pb-4">
+  {/* Readiness — 14d trend with 28d corridor */}
+  <div className="card space-y-2">
+    <h3 className="text-lg font-medium">Readiness — 14‑day trend</h3>
+    <div className="h-56">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={readinessData.slice(-14)} margin={{ left: 8, right: 8, top: 0, bottom: 0 }}>
-          <XAxis dataKey="date" tick={false} />
-          <YAxis domain={[0, 100]} tick={false} />
-          <ReferenceArea y1={0} y2={40}  fill="#ef4444" fillOpacity={0.06} />
-          <ReferenceArea y1={40} y2={70} fill="#f59e0b" fillOpacity={0.06} />
-          <ReferenceArea y1={70} y2={100} fill="#22c55e" fillOpacity={0.06} />
-          <Line type="monotone" dataKey="score" stroke={gaugeColor} strokeWidth={2} dot={false} />
+        <ComposedChart data={readinessTrend14} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
+          <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+          <Tooltip
+            formatter={(v: any, n: any, { payload }: any) => {
+              if (n === 'Readiness') return [`${Math.round(Number(v))}`, 'Readiness'];
+              if (n === 'Band') {
+                const low = payload.baseLow;
+                const high = low != null ? low + payload.band : null;
+                return high != null ? [`${Math.round(low)}–${Math.round(high)}`, 'Baseline'] : ['—', 'Baseline'];
+              }
+              return [v, n];
+            }}
+            labelFormatter={(label) => `Date: ${label}`}
+          />
+          {/* Corridor band */}
+          <Area type="monotone" dataKey="baseLow" stackId="rb" stroke="none" fill="transparent" isAnimationActive={false} />
+          <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#94a3b8" fillOpacity={0.12} isAnimationActive={false} name="Band" />
+          {/* Readiness bars with zone colors */}
+          <Bar dataKey="score" name="Readiness" barSize={12}>
+            {readinessTrend14.map((d, i) => (
+              <Cell key={i} fill={d.score < 40 ? '#ef4444' : d.score < 70 ? '#f59e0b' : '#22c55e'} />
+            ))}
+          </Bar>
         </ComposedChart>
       </ResponsiveContainer>
     </div>
   </div>
+  // Readiness long history (60d) for corridor computation
+  const readinessLongData = useMemo(() => {
+    const targetSleep = 7.5;
+    const out: { date: string; score: number }[] = [];
+    for (let i = 0; i < 60; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - (59 - i));
+      const iso = d.toISOString().slice(0, 10);
+      const e = entries[iso];
+      const hrv = e ? toNumHRV(e.mindset?.hrv) : 0;
+      const rhr = e ? toNum(e.mindset?.rhr) : 0;
+      let sleepSum = 0, sleepCnt = 0;
+      for (let k = 0; k < 7; k++) { const dd = new Date(d); dd.setDate(d.getDate() - k); const key = dd.toISOString().slice(0,10); const se = entries[key]; const hrs = se ? hhmmToHours(se.mindset?.sleepHrs) : 0; if (hrs > 0) { sleepSum += hrs; sleepCnt++; } }
+      const sleep7 = sleepCnt ? sleepSum / sleepCnt : 0;
+      const mood   = e ? toNum(e.mindset?.mood)   : 0;
+      const stress = e ? toNum(e.mindset?.stress) : 0;
+      const hrvVals: number[] = []; const rhrVals: number[] = [];
+      for (let k = 1; k <= 28; k++) { const dd = new Date(d); dd.setDate(d.getDate() - k); const key = dd.toISOString().slice(0,10); const ee = entries[key]; const hv = ee ? toNumHRV(ee.mindset?.hrv) : 0; const rv = ee ? toNum(ee.mindset?.rhr) : 0; if (hv > 0) hrvVals.push(hv); if (rv > 0) rhrVals.push(rv); }
+      const hrvMean = hrvVals.length ? hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length : 0;
+      const hrvSd   = hrvVals.length ? Math.sqrt(hrvVals.reduce((a,b)=>a+(b-hrvMean)**2,0)/hrvVals.length) : 0;
+      const rhrMean = rhrVals.length ? rhrVals.reduce((a,b)=>a+b,0)/rhrVals.length : 0;
+      const rhrSd   = rhrVals.length ? Math.sqrt(rhrVals.reduce((a,b)=>a+(b-rhrMean)**2,0)/rhrVals.length) : 0;
+      let zHRV = (hrvSd>0? (hrv - hrvMean)/hrvSd : 0); let zRHR = (rhrSd>0? (rhr - rhrMean)/rhrSd : 0); zRHR = -zRHR;
+      const mapZ = (z:number)=> (Math.max(-2.5, Math.min(2.5, z)) + 2.5) / 5.0;
+      const hrvScore = mapZ(zHRV); const rhrScore = mapZ(zRHR);
+      const sleepDev = Math.max(-2, Math.min(2, sleep7 - targetSleep)); const sleepScore = (sleepDev + 2) / 4;
+      const mood01 = mood ? Math.max(-1, Math.min(1, (mood-3)/2))*0.5 + 0.5 : 0.5;
+      const stressInv = stress ? (6 - stress) : 3; const stress01 = Math.max(-1, Math.min(1, (stressInv-3)/2))*0.5 + 0.5;
+      const readiness01 = 0.35*hrvScore + 0.25*rhrScore + 0.25*sleepScore + 0.15*((mood01+stress01)/2);
+      const score = Math.round(Math.max(0, Math.min(100, readiness01*100)));
+      out.push({ date: iso.slice(5), score });
+    }
+    return out;
+  }, [entries]);
+
+  // Build last 14d with 28d corridor (mean ± 1 SD of prior 28d scores)
+  const readinessTrend14 = useMemo(() => {
+    const data = readinessLongData;
+    const out: { date: string; score: number; baseLow: number | null; band: number }[] = [];
+    for (let i = Math.max(0, data.length - 14); i < data.length; i++) {
+      const prior = data.slice(Math.max(0, i - 28), i).map(d => d.score);
+      let baseLow: number | null = null; let band = 0;
+      if (prior.length >= 10) {
+        const mean = prior.reduce((a,b)=>a+b,0)/prior.length;
+        const sd = Math.sqrt(prior.reduce((a,b)=>a+(b-mean)**2,0)/prior.length);
+        baseLow = mean - sd; const baseHigh = mean + sd; band = Math.max(0, baseHigh - baseLow);
+      }
+      out.push({ date: data[i].date, score: data[i].score, baseLow, band });
+    }
+    return out;
+  }, [readinessLongData]);
       </div>
 
       {/* Calendar (left) + Journal (right) */}

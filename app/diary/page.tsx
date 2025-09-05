@@ -620,6 +620,23 @@ const readinessTrend14 = useMemo(() => {
   return out;
 }, [readinessLongData]);
 
+// Build last 7d with 28d corridor (mean ± 1 SD of prior 28d scores)
+const readinessTrend7 = useMemo(() => {
+  const data = readinessLongData;
+  const out: { date: string; score: number; baseLow: number | null; band: number }[] = [];
+  for (let i = Math.max(0, data.length - 7); i < data.length; i++) {
+    const prior = data.slice(Math.max(0, i - 28), i).map(d => d.score);
+    let baseLow: number | null = null; let band = 0;
+    if (prior.length >= 10) {
+      const mean = prior.reduce((a,b)=>a+b,0)/prior.length;
+      const sd = Math.sqrt(prior.reduce((a,b)=>a+(b-mean)**2,0)/prior.length);
+      baseLow = mean - sd; const baseHigh = mean + sd; band = Math.max(0, baseHigh - baseLow);
+    }
+    out.push({ date: data[i].date, score: data[i].score, baseLow, band });
+  }
+  return out;
+}, [readinessLongData]);
+
 // helper: HRV numeric
 function toNumHRV(v: any) {
   const n = Number(String(v ?? '').replace(/[^0-9.-]/g, ''));
@@ -947,12 +964,12 @@ const rhrCorridorData = useMemo(() => {
     </div>
   </div>
 
-  {/* Readiness — 14d trend with 28d corridor */}
+  {/* Readiness — 7d trend with 28d corridor */}
   <div className="card space-y-2">
-    <h3 className="text-lg font-medium">Readiness — 14‑day trend</h3>
+    <h3 className="text-lg font-medium">Readiness — 7‑day trend</h3>
     <div className="h-56">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={readinessTrend14} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+        <ComposedChart data={readinessTrend7} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
           <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
           <Tooltip
@@ -969,13 +986,9 @@ const rhrCorridorData = useMemo(() => {
           />
           {/* Corridor band */}
           <Area type="monotone" dataKey="baseLow" stackId="rb" stroke="none" fill="transparent" isAnimationActive={false} />
-          <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#94a3b8" fillOpacity={0.12} isAnimationActive={false} name="Band" />
-          {/* Readiness bars with zone colors */}
-          <Bar dataKey="score" name="Readiness" barSize={12}>
-            {readinessTrend14.map((d, i) => (
-              <Cell key={i} fill={d.score < 40 ? '#ef4444' : d.score < 70 ? '#f59e0b' : '#22c55e'} />
-            ))}
-          </Bar>
+          <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#fc4c02" fillOpacity={0.12} isAnimationActive={false} name="Band" />
+          {/* Rounded orange bars */}
+          <Bar dataKey="score" name="Readiness" barSize={14} fill="#fc4c02" radius={[8,8,0,0]} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

@@ -964,12 +964,12 @@ const rhrCorridorData = useMemo(() => {
     </div>
   </div>
 
-  {/* Readiness — 7d trend with 28d corridor */}
+  {/* Readiness — 14d trend with 28d corridor */}
   <div className="card space-y-2">
-    <h3 className="text-lg font-medium">Readiness — 7‑day trend</h3>
+    <h3 className="text-lg font-medium">Readiness — 14‑day trend</h3>
     <div className="h-56">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={readinessTrend7} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+        <ComposedChart data={readinessTrend14} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
           <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={6} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
           <Tooltip
@@ -988,7 +988,7 @@ const rhrCorridorData = useMemo(() => {
           <Area type="monotone" dataKey="baseLow" stackId="rb" stroke="none" fill="transparent" isAnimationActive={false} />
           <Area type="monotone" dataKey="band"    stackId="rb" stroke="none" fill="#fc4c02" fillOpacity={0.12} isAnimationActive={false} name="Band" />
           {/* Rounded orange bars */}
-          <Bar dataKey="score" name="Readiness" barSize={14} fill="#fc4c02" radius={[8,8,0,0]} />
+          <Bar dataKey="score" name="Readiness" barSize={18} fill="#fc4c02" radius={[6,6,0,0]} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

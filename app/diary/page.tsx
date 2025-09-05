@@ -883,14 +883,15 @@ const rhrCorridorData = useMemo(() => {
   <div className="card relative">
     {/* Title top-left */}
     <div className="absolute top-4 left-4 text-lg font-medium">Readiness</div>
+
     {/* Gauge centered */}
-    <div className="flex items-center justify-center py-6">
-      <div className="relative" style={{ width: 260, height: 260 }}>
+    <div className="flex items-center justify-center pt-8 pb-2">
+      <div className="relative" style={{ width: 280, height: 240 }}>
         <RadialBarChart
-          width={260}
-          height={260}
-          innerRadius={100}
-          outerRadius={120}
+          width={280}
+          height={240}
+          innerRadius={105}
+          outerRadius={125}
           startAngle={225}
           endAngle={-45}
           data={[{ name: 'Readiness', value: todayScore }]}
@@ -903,6 +904,20 @@ const rhrCorridorData = useMemo(() => {
           <div className="text-5xl font-semibold tabular-nums">{todayScore}</div>
         </div>
       </div>
+    </div>
+
+    {/* Compact 14‑day sparkline to use remaining space */}
+    <div className="h-16 px-6 pb-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={readinessData.slice(-14)} margin={{ left: 8, right: 8, top: 0, bottom: 0 }}>
+          <XAxis dataKey="date" tick={false} />
+          <YAxis domain={[0, 100]} tick={false} />
+          <ReferenceArea y1={0} y2={40}  fill="#ef4444" fillOpacity={0.06} />
+          <ReferenceArea y1={40} y2={70} fill="#f59e0b" fillOpacity={0.06} />
+          <ReferenceArea y1={70} y2={100} fill="#22c55e" fillOpacity={0.06} />
+          <Line type="monotone" dataKey="score" stroke={gaugeColor} strokeWidth={2} dot={false} />
+        </ComposedChart>
+      </ResponsiveContainer>
     </div>
   </div>
       </div>

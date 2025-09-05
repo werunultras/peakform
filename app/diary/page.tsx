@@ -550,6 +550,76 @@ const readinessData = useMemo(() => {
   return out;
 }, [entries]);
 
+// Readiness long history (60d) for corridor computation
+const readinessLongData = useMemo(() => {
+  const targetSleep = 7.5;
+  const out: { date: string; score: number }[] = [];
+  for (let i = 0; i < 60; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - (59 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const e = entries[iso];
+    const hrv = e ? toNumHRV(e.mindset?.hrv) : 0;
+    const rhr = e ? toNum(e.mindset?.rhr) : 0;
+    let sleepSum = 0, sleepCnt = 0;
+    for (let k = 0; k < 7; k++) {
+      const dd = new Date(d); dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0,10);
+      const se = entries[key];
+      const hrs = se ? hhmmToHours(se.mindset?.sleepHrs) : 0;
+      if (hrs > 0) { sleepSum += hrs; sleepCnt++; }
+    }
+    const sleep7 = sleepCnt ? sleepSum / sleepCnt : 0;
+    const mood   = e ? toNum(e.mindset?.mood)   : 0;
+    const stress = e ? toNum(e.mindset?.stress) : 0;
+    const hrvVals: number[] = []; const rhrVals: number[] = [];
+    for (let k = 1; k <= 28; k++) {
+      const dd = new Date(d); dd.setDate(d.getDate() - k);
+      const key = dd.toISOString().slice(0,10);
+      const ee = entries[key];
+      const hv = ee ? toNumHRV(ee.mindset?.hrv) : 0;
+      const rv = ee ? toNum(ee.mindset?.rhr) : 0;
+      if (hv > 0) hrvVals.push(hv);
+      if (rv > 0) rhrVals.push(rv);
+    }
+    const hrvMean = hrvVals.length ? hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length : 0;
+    const hrvSd   = hrvVals.length ? Math.sqrt(hrvVals.reduce((a,b)=>a+(b-hrvMean)**2,0)/hrvVals.length) : 0;
+    const rhrMean = rhrVals.length ? rhrVals.reduce((a,b)=>a+b,0)/rhrVals.length : 0;
+    const rhrSd   = rhrVals.length ? Math.sqrt(rhrVals.reduce((a,b)=>a+(b-rhrMean)**2,0)/rhrVals.length) : 0;
+    let zHRV = (hrvSd>0? (hrv - hrvMean)/hrvSd : 0);
+    let zRHR = (rhrSd>0? (rhr - rhrMean)/rhrSd : 0); zRHR = -zRHR;
+    const mapZ = (z:number)=> (Math.max(-2.5, Math.min(2.5, z)) + 2.5) / 5.0;
+    const hrvScore = mapZ(zHRV);
+    const rhrScore = mapZ(zRHR);
+    const sleepDev = Math.max(-2, Math.min(2, sleep7 - targetSleep));
+    const sleepScore = (sleepDev + 2) / 4;
+    const mood01 = mood ? Math.max(-1, Math.min(1, (mood-3)/2))*0.5 + 0.5 : 0.5;
+    const stressInv = stress ? (6 - stress) : 3;
+    const stress01 = Math.max(-1, Math.min(1, (stressInv-3)/2))*0.5 + 0.5;
+    const readiness01 = 0.35*hrvScore + 0.25*rhrScore + 0.25*sleepScore + 0.15*((mood01+stress01)/2);
+    const score = Math.round(Math.max(0, Math.min(100, readiness01*100)));
+    out.push({ date: iso.slice(5), score });
+  }
+  return out;
+}, [entries]);
+
+// Build last 14d with 28d corridor (mean ± 1 SD of prior 28d scores)
+const readinessTrend14 = useMemo(() => {
+  const data = readinessLongData;
+  const out: { date: string; score: number; baseLow: number | null; band: number }[] = [];
+  for (let i = Math.max(0, data.length - 14); i < data.length; i++) {
+    const prior = data.slice(Math.max(0, i - 28), i).map(d => d.score);
+    let baseLow: number | null = null; let band = 0;
+    if (prior.length >= 10) {
+      const mean = prior.reduce((a,b)=>a+b,0)/prior.length;
+      const sd = Math.sqrt(prior.reduce((a,b)=>a+(b-mean)**2,0)/prior.length);
+      baseLow = mean - sd; const baseHigh = mean + sd; band = Math.max(0, baseHigh - baseLow);
+    }
+    out.push({ date: data[i].date, score: data[i].score, baseLow, band });
+  }
+  return out;
+}, [readinessLongData]);
+
 // helper: HRV numeric
 function toNumHRV(v: any) {
   const n = Number(String(v ?? '').replace(/[^0-9.-]/g, ''));
@@ -910,57 +980,6 @@ const rhrCorridorData = useMemo(() => {
       </ResponsiveContainer>
     </div>
   </div>
-  // Readiness long history (60d) for corridor computation
-  const readinessLongData = useMemo(() => {
-    const targetSleep = 7.5;
-    const out: { date: string; score: number }[] = [];
-    for (let i = 0; i < 60; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - (59 - i));
-      const iso = d.toISOString().slice(0, 10);
-      const e = entries[iso];
-      const hrv = e ? toNumHRV(e.mindset?.hrv) : 0;
-      const rhr = e ? toNum(e.mindset?.rhr) : 0;
-      let sleepSum = 0, sleepCnt = 0;
-      for (let k = 0; k < 7; k++) { const dd = new Date(d); dd.setDate(d.getDate() - k); const key = dd.toISOString().slice(0,10); const se = entries[key]; const hrs = se ? hhmmToHours(se.mindset?.sleepHrs) : 0; if (hrs > 0) { sleepSum += hrs; sleepCnt++; } }
-      const sleep7 = sleepCnt ? sleepSum / sleepCnt : 0;
-      const mood   = e ? toNum(e.mindset?.mood)   : 0;
-      const stress = e ? toNum(e.mindset?.stress) : 0;
-      const hrvVals: number[] = []; const rhrVals: number[] = [];
-      for (let k = 1; k <= 28; k++) { const dd = new Date(d); dd.setDate(d.getDate() - k); const key = dd.toISOString().slice(0,10); const ee = entries[key]; const hv = ee ? toNumHRV(ee.mindset?.hrv) : 0; const rv = ee ? toNum(ee.mindset?.rhr) : 0; if (hv > 0) hrvVals.push(hv); if (rv > 0) rhrVals.push(rv); }
-      const hrvMean = hrvVals.length ? hrvVals.reduce((a,b)=>a+b,0)/hrvVals.length : 0;
-      const hrvSd   = hrvVals.length ? Math.sqrt(hrvVals.reduce((a,b)=>a+(b-hrvMean)**2,0)/hrvVals.length) : 0;
-      const rhrMean = rhrVals.length ? rhrVals.reduce((a,b)=>a+b,0)/rhrVals.length : 0;
-      const rhrSd   = rhrVals.length ? Math.sqrt(rhrVals.reduce((a,b)=>a+(b-rhrMean)**2,0)/rhrVals.length) : 0;
-      let zHRV = (hrvSd>0? (hrv - hrvMean)/hrvSd : 0); let zRHR = (rhrSd>0? (rhr - rhrMean)/rhrSd : 0); zRHR = -zRHR;
-      const mapZ = (z:number)=> (Math.max(-2.5, Math.min(2.5, z)) + 2.5) / 5.0;
-      const hrvScore = mapZ(zHRV); const rhrScore = mapZ(zRHR);
-      const sleepDev = Math.max(-2, Math.min(2, sleep7 - targetSleep)); const sleepScore = (sleepDev + 2) / 4;
-      const mood01 = mood ? Math.max(-1, Math.min(1, (mood-3)/2))*0.5 + 0.5 : 0.5;
-      const stressInv = stress ? (6 - stress) : 3; const stress01 = Math.max(-1, Math.min(1, (stressInv-3)/2))*0.5 + 0.5;
-      const readiness01 = 0.35*hrvScore + 0.25*rhrScore + 0.25*sleepScore + 0.15*((mood01+stress01)/2);
-      const score = Math.round(Math.max(0, Math.min(100, readiness01*100)));
-      out.push({ date: iso.slice(5), score });
-    }
-    return out;
-  }, [entries]);
-
-  // Build last 14d with 28d corridor (mean ± 1 SD of prior 28d scores)
-  const readinessTrend14 = useMemo(() => {
-    const data = readinessLongData;
-    const out: { date: string; score: number; baseLow: number | null; band: number }[] = [];
-    for (let i = Math.max(0, data.length - 14); i < data.length; i++) {
-      const prior = data.slice(Math.max(0, i - 28), i).map(d => d.score);
-      let baseLow: number | null = null; let band = 0;
-      if (prior.length >= 10) {
-        const mean = prior.reduce((a,b)=>a+b,0)/prior.length;
-        const sd = Math.sqrt(prior.reduce((a,b)=>a+(b-mean)**2,0)/prior.length);
-        baseLow = mean - sd; const baseHigh = mean + sd; band = Math.max(0, baseHigh - baseLow);
-      }
-      out.push({ date: data[i].date, score: data[i].score, baseLow, band });
-    }
-    return out;
-  }, [readinessLongData]);
       </div>
 
       {/* Calendar (left) + Journal (right) */}

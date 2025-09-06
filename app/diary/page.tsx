@@ -760,7 +760,7 @@ const rhrCorridorData = useMemo(() => {
     return weeks;
   }, [entries]);
 
-  // Calendar weeks (Mon–Sun) for last 4 weeks, color-coded by nutrition/training
+  // Calendar weeks (Mon–Sun) for last 4 weeks, plus weekly running total (km)
   const calendarWeeks = useMemo(() => {
     const today = new Date();
     const day = today.getDay(); // 0=Sun..6=Sat
@@ -769,9 +769,12 @@ const rhrCorridorData = useMemo(() => {
     // Start from Monday 3 weeks ago (4 weeks including current)
     start.setDate(today.getDate() - offsetToMonday - 7 * 3);
 
-    const weeks: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[][] = [];
+    type Day = { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' };
+    const weeks: { days: Day[]; totalKm: number }[] = [];
+
     for (let w = 0; w < 4; w++) {
-      const days: { iso: string; dayNum: number; status: 'none' | 'nut' | 'train' }[] = [];
+      const days: Day[] = [];
+      let totalKm = 0;
       for (let d = 0; d < 7; d++) {
         const dt = new Date(start);
         dt.setDate(start.getDate() + w * 7 + d);
@@ -784,8 +787,9 @@ const rhrCorridorData = useMemo(() => {
         if (kcal > 0 && (runDist > 0 || strengthRounds > 0)) status = 'train';
         else if (kcal > 0) status = 'nut';
         days.push({ iso, dayNum: dt.getDate(), status });
+        totalKm += runDist;
       }
-      weeks.push(days);
+      weeks.push({ days, totalKm });
     }
     return weeks;
   }, [entries]);
@@ -967,13 +971,13 @@ const rhrCorridorData = useMemo(() => {
   {/* Calendar card replaces Readiness card */}
   <div className="card space-y-3">
     <h3 className="text-lg font-medium">Calendar</h3>
-    <div className="grid grid-cols-7 gap-2 text-center text-xs text-neutral-600">
-      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    <div className="grid grid-cols-8 gap-2 text-center text-xs text-neutral-600">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div><div>Run</div>
     </div>
     <div className="space-y-2">
       {calendarWeeks.map((week, wi) => (
-        <div key={wi} className="grid grid-cols-7 gap-2">
-          {week.map((day) => (
+        <div key={wi} className="grid grid-cols-8 gap-2 items-center">
+          {week.days.map((day) => (
             <div key={day.iso} className="flex items-center justify-center">
               <div
                 className={'w-8 h-8 rounded-full border flex items-center justify-center ' + (day.status === 'train' ? 'text-white border-black' : day.status === 'nut' ? 'text-white border-black' : 'border-black')}
@@ -984,6 +988,12 @@ const rhrCorridorData = useMemo(() => {
               </div>
             </div>
           ))}
+          {/* Weekly running total (km) */}
+          <div className="flex items-center justify-center">
+            <span className="rounded-full bg-white border border-white/30 px-2 py-1 text-[11px] tabular-nums">
+              {Math.round(week.totalKm)}
+            </span>
+          </div>
         </div>
       ))}
     </div>

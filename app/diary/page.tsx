@@ -990,9 +990,17 @@ const rhrCorridorData = useMemo(() => {
           ))}
           {/* Weekly running total (km) */}
           <div className="flex items-center justify-center">
-            <span className="rounded-full bg-white border border-white/30 px-2 py-1 text-[11px] tabular-nums">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] tabular-nums"
+              style={{
+                background: 'linear-gradient(180deg, #ffd1bd 0%, #ff955c 100%)',
+                border: '1px solid #d63b00',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.3)'
+              }}
+              title="Weekly running total (km)"
+            >
               {Math.round(week.totalKm)}
-            </span>
+            </div>
           </div>
         </div>
       ))}

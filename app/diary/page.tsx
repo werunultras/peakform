@@ -884,6 +884,17 @@ const rhrCorridorData = useMemo(() => {
 
   const n = entry.nutrition;
 
+  // Load Strava embed script when embed snippet is present
+  useEffect(() => {
+    const html = (entry.workout?.run as any)?.stravaEmbed || '';
+    if (!html) return;
+    const src = 'https://strava-embeds.com/embed.js';
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    document.body.appendChild(s);
+    return () => { try { document.body.removeChild(s); } catch {} };
+  }, [entry.workout?.run?.stravaEmbed]);
+
   // ---------- View ----------
   return (
     <div className="space-y-6">
@@ -1404,15 +1415,3 @@ const rhrCorridorData = useMemo(() => {
     </div>
   );
 }
-
-  // Load Strava embed script when embed snippet is present
-  useEffect(() => {
-    const html = (entry.workout?.run as any)?.stravaEmbed || '';
-    if (!html) return;
-    const src = 'https://strava-embeds.com/embed.js';
-    // if already injected, add another tag to retrigger; otherwise append
-    const s = document.createElement('script');
-    s.src = src; s.async = true;
-    document.body.appendChild(s);
-    return () => { try { document.body.removeChild(s); } catch {} };
-  }, [entry.workout?.run]);

@@ -1376,6 +1376,39 @@ const rhrCorridorData = useMemo(() => {
       {/* Route Map (experimental) */}
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Route Map (experimental)</h3>
+
+        {/* Strava URL input */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+          <div className="md:col-span-3">
+            <div className="label">Strava link (optional)</div>
+            <input
+              className="input"
+              placeholder="https://www.strava.com/activities/1234567890"
+              value={entry.workout?.run?.stravaUrl || ''}
+              onChange={(e) => update('workout.run.stravaUrl', e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-1 flex gap-2">
+            <button
+              type="button"
+              className="btn bg-white"
+              onClick={() => update('workout.run.stravaUrl', entry.workout?.run?.stravaUrl || '')}
+              title="Save link"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              className="btn bg-white"
+              onClick={() => update('workout.run.stravaUrl', '')}
+              title="Clear link"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        {/* Preview */}
         {entry?.workout?.run?.stravaUrl ? (
           <iframe
             src={entry.workout.run.stravaUrl}

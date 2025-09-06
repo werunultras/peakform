@@ -1372,6 +1372,21 @@ const rhrCorridorData = useMemo(() => {
           <button className="btn" onClick={copyPrompt}>Copy</button>
         </div>
       </div>
+
+      {/* Route Map (experimental) */}
+      <div className="card space-y-3">
+        <h3 className="text-lg font-medium">Route Map (experimental)</h3>
+        {entry?.workout?.run?.stravaUrl ? (
+          <iframe
+            src={entry.workout.run.stravaUrl}
+            className="w-full h-96 rounded-lg border"
+            allowFullScreen
+            title="Strava Route Map"
+          />
+        ) : (
+          <div className="text-neutral-500 text-sm">No route map available. Add a Strava link to display it here.</div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1377,49 +1377,42 @@ const rhrCorridorData = useMemo(() => {
       <div className="card space-y-3">
         <h3 className="text-lg font-medium">Route Map (experimental)</h3>
 
-        {/* Strava URL input */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-          <div className="md:col-span-3">
-            <div className="label">Strava link (optional)</div>
-            <input
-              className="input"
-              placeholder="https://www.strava.com/activities/1234567890"
-              value={entry.workout?.run?.stravaUrl || ''}
-              onChange={(e) => update('workout.run.stravaUrl', e.target.value)}
-            />
-          </div>
-          <div className="md:col-span-1 flex gap-2">
-            <button
-              type="button"
-              className="btn bg-white"
-              onClick={() => update('workout.run.stravaUrl', entry.workout?.run?.stravaUrl || '')}
-              title="Save link"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn bg-white"
-              onClick={() => update('workout.run.stravaUrl', '')}
-              title="Clear link"
-            >
-              Clear
-            </button>
-          </div>
+        {/* Strava embed code input */}
+        <div>
+          <div className="label">Strava embed code (paste snippet)</div>
+          <textarea
+            className="input h-28 font-mono text-xs"
+            placeholder='&lt;div class="strava-embed-placeholder" data-embed-type="activity" data-embed-id="15715184836" data-style="standard" data-from-embed="false"&gt;&lt;/div&gt;\n&lt;script src="https://strava-embeds.com/embed.js"&gt;&lt;/script&gt;'
+            value={(entry.workout?.run as any)?.stravaEmbed || ''}
+            onChange={(e) => update('workout.run.stravaEmbed', e.target.value)}
+          />
+          <p className="text-xs text-neutral-500 mt-1">Only public activities will render. Get the snippet from Strava → Share → Embed on blog.</p>
         </div>
 
         {/* Preview */}
-        {entry?.workout?.run?.stravaUrl ? (
-          <iframe
-            src={entry.workout.run.stravaUrl}
-            className="w-full h-96 rounded-lg border"
-            allowFullScreen
-            title="Strava Route Map"
-          />
+        {entry?.workout?.run && (entry.workout.run as any).stravaEmbed ? (
+          <div className="rounded-lg overflow-hidden border bg-white">
+            <div
+              className="[&>*]:max-w-full"
+              dangerouslySetInnerHTML={{ __html: (entry.workout.run as any).stravaEmbed || '' }}
+            />
+          </div>
         ) : (
-          <div className="text-neutral-500 text-sm">No route map available. Add a Strava link to display it here.</div>
+          <div className="text-neutral-500 text-sm">No route map available. Paste the Strava embed snippet above.</div>
         )}
       </div>
     </div>
   );
 }
+
+  // Load Strava embed script when embed snippet is present
+  useEffect(() => {
+    const html = (entry.workout?.run as any)?.stravaEmbed || '';
+    if (!html) return;
+    const src = 'https://strava-embeds.com/embed.js';
+    // if already injected, add another tag to retrigger; otherwise append
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    document.body.appendChild(s);
+    return () => { try { document.body.removeChild(s); } catch {} };
+  }, [entry.workout?.run]);

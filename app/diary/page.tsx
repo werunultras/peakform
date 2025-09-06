@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, RadialBarChart, RadialBar, PolarAngleAxis, Cell, } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
@@ -1371,55 +1371,6 @@ const rhrCorridorData = useMemo(() => {
         <div className="flex justify-end">
           <button className="btn" onClick={copyPrompt}>Copy</button>
         </div>
-      </div>
-
-      {/* Route Map (experimental) */}
-      <div className="card space-y-3">
-        <h3 className="text-lg font-medium">Route Map (experimental)</h3>
-
-        {/* Strava embed code input */}
-        <div>
-          <div className="label">Strava embed code (paste snippet)</div>
-          <textarea
-            className="input h-28 font-mono text-xs"
-            placeholder='&lt;div class="strava-embed-placeholder" data-embed-type="activity" data-embed-id="15715184836" data-style="standard" data-from-embed="false"&gt;&lt;/div&gt;\n&lt;script src="https://strava-embeds.com/embed.js"&gt;&lt;/script&gt;'
-            value={(entry.workout?.run as any)?.stravaEmbed || ''}
-            onChange={(e) => update('workout.run.stravaEmbed', e.target.value)}
-          />
-          <p className="text-xs text-neutral-500 mt-1">Only public activities will render. Get the snippet from Strava → Share → Embed on blog.</p>
-        </div>
-
-        {/* Compute minimal srcDoc for Strava embed */}
-        {(() => {
-          // Build a minimal embed srcDoc from the pasted snippet (extract ID & type)
-          const raw = (entry.workout?.run as any)?.stravaEmbed || '';
-          const idMatch = raw.match(/data-embed-id="(\d+)"/i);
-          const typeMatch = raw.match(/data-embed-type="(route|activity)"/i);
-          const embedId = idMatch ? idMatch[1] : '';
-          const embedType = typeMatch ? typeMatch[1] : 'activity';
-          // expose to render scope
-          (entry.workout!.run as any).__embedId = embedId;
-          (entry.workout!.run as any).__embedType = embedType;
-          return null;
-        })()}
-
-        {/* Preview (sandboxed iframe) */}
-        {(() => {
-          const embedId = (entry.workout?.run as any).__embedId as string | undefined;
-          const embedType = (entry.workout?.run as any).__embedType as string | undefined;
-          if (!embedId) {
-            return <div className="text-neutral-500 text-sm">No route map available. Paste the Strava embed snippet above.</div>;
-          }
-          const srcDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;padding:0"><div class="strava-embed-placeholder" data-embed-type="${embedType}" data-embed-id="${embedId}" data-style="standard" data-from-embed="false"></div><script src="https://strava-embeds.com/embed.js"><\/script></body></html>`;
-          return (
-            <iframe
-              className="w-full h-96 rounded-lg border bg-white"
-              title="Strava Route Map"
-              sandbox="allow-scripts allow-same-origin"
-              srcDoc={srcDoc}
-            />
-          );
-        })()}
       </div>
     </div>
   );

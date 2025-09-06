@@ -884,15 +884,23 @@ const rhrCorridorData = useMemo(() => {
 
   const n = entry.nutrition;
 
-  // Load Strava embed script when embed snippet is present
+  // Load Strava embed script when embed snippet is present (singleton, Safari robust)
   useEffect(() => {
     const html = (entry.workout?.run as any)?.stravaEmbed || '';
     if (!html) return;
     const src = 'https://strava-embeds.com/embed.js';
-    const s = document.createElement('script');
-    s.src = src; s.async = true;
-    document.body.appendChild(s);
-    return () => { try { document.body.removeChild(s); } catch {} };
+    // Only load once per page to avoid Safari conflicts
+    const w = window as any;
+    if (!w.__stravaEmbedLoaded) {
+      const s = document.createElement('script');
+      s.src = src; s.async = true;
+      document.body.appendChild(s);
+      w.__stravaEmbedLoaded = true;
+    } else {
+      // If script already present, Strava re-initializes automatically when DOM contains placeholders
+      // Optionally, re-dispatch a DOMContentLoaded-like event if needed
+      try { document.dispatchEvent(new Event('DOMContentLoaded')); } catch {}
+    }
   }, [entry.workout?.run?.stravaEmbed]);
 
   // ---------- View ----------
@@ -1403,10 +1411,17 @@ const rhrCorridorData = useMemo(() => {
         {/* Preview */}
         {entry?.workout?.run && (entry.workout.run as any).stravaEmbed ? (
           <div className="rounded-lg overflow-hidden border bg-white">
-            <div
-              className="[&>*]:max-w-full"
-              dangerouslySetInnerHTML={{ __html: (entry.workout.run as any).stravaEmbed || '' }}
-            />
+            {(() => {
+              const raw = (entry.workout.run as any).stravaEmbed || '';
+              // strip any <script>...</script> tags from the pasted snippet to avoid double-injection issues
+              const sanitized = raw.replace(/<script[\s\S]*?<\/script>/gi, '');
+              return (
+                <div
+                  className="[&>*]:max-w-full"
+                  dangerouslySetInnerHTML={{ __html: sanitized }}
+                />
+              );
+            })()}
           </div>
         ) : (
           <div className="text-neutral-500 text-sm">No route map available. Paste the Strava embed snippet above.</div>

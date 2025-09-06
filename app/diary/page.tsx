@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Legend, RadialBarChart, RadialBar, PolarAngleAxis, Cell, } from 'recharts';
 import { emptyEntry, defaultSettings, pushEntry, pushSettings, pullCloud, getUser } from '@/lib/storage';
 import type { Entry, Settings } from '@/lib/types';
@@ -883,24 +883,19 @@ const rhrCorridorData = useMemo(() => {
   );
 
   const n = entry.nutrition;
-
-  // Load Strava embed script when embed snippet is present (singleton, Safari robust)
+  const stravaFrameRef = useRef<HTMLIFrameElement | null>(null);
   useEffect(() => {
-    const html = (entry.workout?.run as any)?.stravaEmbed || '';
-    if (!html) return;
-    const src = 'https://strava-embeds.com/embed.js';
-    // Only load once per page to avoid Safari conflicts
-    const w = window as any;
-    if (!w.__stravaEmbedLoaded) {
-      const s = document.createElement('script');
-      s.src = src; s.async = true;
-      document.body.appendChild(s);
-      w.__stravaEmbedLoaded = true;
-    } else {
-      // If script already present, Strava re-initializes automatically when DOM contains placeholders
-      // Optionally, re-dispatch a DOMContentLoaded-like event if needed
-      try { document.dispatchEvent(new Event('DOMContentLoaded')); } catch {}
-    }
+    const raw = (entry.workout?.run as any)?.stravaEmbed || '';
+    if (!stravaFrameRef.current) return;
+    const doc = stravaFrameRef.current.contentDocument || stravaFrameRef.current.contentWindow?.document;
+    if (!doc) return;
+    // Sanitize: keep placeholder divs, allow the embed script inside the iframe
+    const sanitized = raw || '';
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">`+
+      `</head><body style="margin:0;padding:0">${sanitized}</body></html>`;
+    doc.open();
+    doc.write(html);
+    doc.close();
   }, [entry.workout?.run?.stravaEmbed]);
 
   // ---------- View ----------
@@ -1408,21 +1403,13 @@ const rhrCorridorData = useMemo(() => {
           <p className="text-xs text-neutral-500 mt-1">Only public activities will render. Get the snippet from Strava → Share → Embed on blog.</p>
         </div>
 
-        {/* Preview */}
+        {/* Preview (sandboxed iframe) */}
         {entry?.workout?.run && (entry.workout.run as any).stravaEmbed ? (
-          <div className="rounded-lg overflow-hidden border bg-white">
-            {(() => {
-              const raw = (entry.workout.run as any).stravaEmbed || '';
-              // strip any <script>...</script> tags from the pasted snippet to avoid double-injection issues
-              const sanitized = raw.replace(/<script[\s\S]*?<\/script>/gi, '');
-              return (
-                <div
-                  className="[&>*]:max-w-full"
-                  dangerouslySetInnerHTML={{ __html: sanitized }}
-                />
-              );
-            })()}
-          </div>
+          <iframe
+            ref={stravaFrameRef}
+            className="w-full h-96 rounded-lg border bg-white"
+            title="Strava Route Map"
+          />
         ) : (
           <div className="text-neutral-500 text-sm">No route map available. Paste the Strava embed snippet above.</div>
         )}
